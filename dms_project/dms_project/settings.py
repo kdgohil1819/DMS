@@ -9,11 +9,12 @@ https://docs.djangoproject.com/en/6.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
-
+import os  # Add this at the top if not present
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
 
 
 # Quick-start development settings - unsuitable for production
@@ -59,8 +60,8 @@ ROOT_URLCONF = 'dms_project.urls'
 
 TEMPLATES = [
     {
-           'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],  # Add this line
+                  'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [BASE_DIR / 'templates'],  # CRITICAL: This must be exactly this
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -130,3 +131,7 @@ MEDIA_ROOT = BASE_DIR / 'media'
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = 'login'
+# TEMPORARY - Add at the bottom of settings.py to debug
+print(f"BASE_DIR: {BASE_DIR}")
+print(f"Templates path: {BASE_DIR / 'templates'}")
+print(f"Does templates folder exist? {(BASE_DIR / 'templates').exists()}")
