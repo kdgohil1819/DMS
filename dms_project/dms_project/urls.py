@@ -17,13 +17,25 @@ Including another URLconf
 # dms_project/urls.py
 from django.contrib import admin
 from django.urls import path, include
+<<<<<<< HEAD
 from django.shortcuts import redirect
 
 def home_redirect(request):
     return redirect('dashboard' if request.user.is_authenticated else 'login')
+=======
+from review import views
+
+>>>>>>> dc87be8 (complete)
 
 urlpatterns = [
+    path('', views.home, name='home'),
     path('admin/', admin.site.urls),
+<<<<<<< HEAD
     path('', home_redirect, name='home'),
     path('accounts/', include('accounts.urls')),
 ]
+=======
+    path('accounts/', include('django.contrib.auth.urls')),
+]
+
+>>>>>>> dc87be8 (complete)
