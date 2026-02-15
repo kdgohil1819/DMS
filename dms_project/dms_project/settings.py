@@ -9,12 +9,13 @@ https://docs.djangoproject.com/en/6.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
+# dms_project/settings.py
+
 import os  # Add this at the top if not present
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 
 # Quick-start development settings - unsuitable for production
@@ -59,8 +60,7 @@ MIDDLEWARE = [
 ROOT_URLCONF = 'dms_project.urls'
 
 TEMPLATES = [
-    {
-                  'BACKEND': 'django.template.backends.django.DjangoTemplates',
+    { 'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [BASE_DIR / 'templates'],  # CRITICAL: This must be exactly this
         'APP_DIRS': True,
         'OPTIONS': {
@@ -127,8 +127,12 @@ STATIC_URL = 'static/'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-# For login/logout settings
-LOGIN_REDIRECT_URL = '/'
+LOGIN_URL = '/accounts/login/'  # Changed from 'login' to full path
+LOGIN_REDIRECT_URL = '/accounts/dashboard'
 LOGOUT_REDIRECT_URL = '/accounts/login/'
 LOGIN_URL = '/accounts/login/'
 
+# TEMPORARY - Add at the bottom of settings.py to debug
+print(f"BASE_DIR: {BASE_DIR}")
+print(f"Templates path: {BASE_DIR / 'templates'}")
+print(f"Does templates folder exist? {(BASE_DIR / 'templates').exists()}")

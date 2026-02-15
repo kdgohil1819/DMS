@@ -35,7 +35,7 @@ def register_view(request):
         )
         
         messages.success(request, 'Registration successful! Please login.')
-        return redirect('login')
+        return redirect('accounts:login')
     
     return render(request, 'accounts/register.html')
 
@@ -50,7 +50,7 @@ def login_view(request):
         if user is not None:
             login(request, user)
             messages.success(request, f'Welcome back, {username}!')
-            return redirect('dashboard')  # We'll create this later
+            return redirect('accounts:dashboard')  # We'll create this later
         else:
             messages.error(request, 'Invalid username or password')
     
@@ -60,7 +60,7 @@ def login_view(request):
 def logout_view(request):
     logout(request)
     messages.success(request, 'Logged out successfully')
-    return redirect('login')
+    return redirect('accounts:login')
 
 # Temporary dashboard view
 def dashboard_view(request):
