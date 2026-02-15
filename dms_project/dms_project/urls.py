@@ -23,6 +23,7 @@ def home_redirect(request):
     return redirect('dashboard' if request.user.is_authenticated else 'login')
 
 urlpatterns = [
+    path('', views.home, name='home'),
     path('admin/', admin.site.urls),
     path('', home_redirect, name='home'),
     path('accounts/', include('accounts.urls')),

@@ -128,10 +128,7 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 # For login/logout settings
-LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = '/'
-LOGOUT_REDIRECT_URL = 'login'
-# TEMPORARY - Add at the bottom of settings.py to debug
-print(f"BASE_DIR: {BASE_DIR}")
-print(f"Templates path: {BASE_DIR / 'templates'}")
-print(f"Does templates folder exist? {(BASE_DIR / 'templates').exists()}")
+LOGOUT_REDIRECT_URL = '/accounts/login/'
+LOGIN_URL = '/accounts/login/'
+
