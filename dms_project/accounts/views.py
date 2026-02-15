@@ -1,3 +1,67 @@
-from django.shortcuts import render
+# accounts/views.py
+from django.shortcuts import render, redirect
+from django.contrib.auth.models import User
+from django.contrib.auth import login, logout, authenticate
+from django.contrib import messages
 
-# Create your views here.
+# R-1.1 User Registration
+def register_view(request):
+    if request.method == 'POST':
+        username = request.POST['username']
+        email = request.POST['email']
+        password = request.POST['password']
+        password2 = request.POST['password2']
+        
+        # Check if passwords match
+        if password != password2:
+            messages.error(request, 'Passwords do not match')
+            return render(request, 'accounts/register.html')
+        
+        # Check if username exists
+        if User.objects.filter(username=username).exists():
+            messages.error(request, 'Username already taken')
+            return render(request, 'accounts/register.html')
+        
+        # Check if email exists
+        if User.objects.filter(email=email).exists():
+            messages.error(request, 'Email already registered')
+            return render(request, 'accounts/register.html')
+        
+        # Create user
+        user = User.objects.create_user(
+            username=username,
+            email=email,
+            password=password
+        )
+        
+        messages.success(request, 'Registration successful! Please login.')
+        return redirect('login')
+    
+    return render(request, 'accounts/register.html')
+
+# R-1.2 User Login
+def login_view(request):
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
+        
+        user = authenticate(request, username=username, password=password)
+        
+        if user is not None:
+            login(request, user)
+            messages.success(request, f'Welcome back, {username}!')
+            return redirect('dashboard')  # We'll create this later
+        else:
+            messages.error(request, 'Invalid username or password')
+    
+    return render(request, 'accounts/login.html')
+
+# R-1.3 Logout
+def logout_view(request):
+    logout(request)
+    messages.success(request, 'Logged out successfully')
+    return redirect('login')
+
+# Temporary dashboard view
+def dashboard_view(request):
+    return render(request, 'accounts/dashboard.html')
