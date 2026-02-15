@@ -1,0 +1,75 @@
+{% extends 'base/base.html' %}
+
+{% block content %}
+<div class="card" style="max-width: 800px; margin: 0 auto;">
+    <h2 style="color: #4a5568; margin-bottom: 2rem;">Upload Document</h2>
+    
+    <div style="background: #f0f4f8; padding: 1rem; border-radius: 8px; margin-bottom: 2rem;">
+        <strong>Supported formats:</strong> {{ supported_formats|join:", " }}
+        <br>
+        <small>Maximum file size: 10MB</small>
+    </div>
+    
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label for="id_title">Title *</label>
+            <input type="text" name="title" id="id_title" class="form-control" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="id_description">Description</label>
+            <textarea name="description" id="id_description" rows="3" class="form-control"></textarea>
+        </div>
+        
+        <div class="form-group">
+            <label for="id_file">File *</label>
+            <input type="file" name="file" id="id_file" class="form-control" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="id_author">Author</label>
+            <input type="text" name="author" id="id_author" class="form-control">
+        </div>
+        
+        <div class="form-group">
+            <label for="id_category">Category</label>
+            <input type="text" name="category" id="id_category" class="form-control">
+        </div>
+        
+        <div class="form-group">
+            <label for="id_tags">Tags</label>
+            <input type="text" name="tags" id="id_tags" class="form-control" 
+                   placeholder="e.g., report, confidential, draft">
+            <small>Separate tags with commas</small>
+        </div>
+        
+        <button type="submit" class="btn">Upload Document</button>
+        <a href="{% url 'documents:my_documents' %}" class="btn" style="background: #6c757d;">Cancel</a>
+    </form>
+</div>
+
+<style>
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        color: #4a5568;
+    }
+    .form-control {
+        width: 100%;
+        padding: 0.75rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 6px;
+        font-size: 1rem;
+    }
+    .form-control:focus {
+        outline: none;
+        border-color: #667eea;
+    }
+</style>
+{% endblock %}

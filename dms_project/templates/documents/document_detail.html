@@ -1,0 +1,88 @@
+{% extends 'base/base.html' %}
+
+{% block content %}
+<div class="card" style="max-width: 800px; margin: 0 auto;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+        <h2 style="color: #4a5568;">{{ document.title }}</h2>
+        <div>
+            <a href="{% url 'documents:download' document.id %}" class="btn" style="background: #48bb78;">Download</a>
+            <a href="{% url 'documents:my_documents' %}" class="btn" style="background: #6c757d;">Back to List</a>
+        </div>
+    </div>
+    
+    <div style="background: #f7fafc; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;">
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;">
+            <div>
+                <strong style="color: #4a5568;">Uploaded by:</strong><br>
+                {{ document.uploader.username }}
+            </div>
+            <div>
+                <strong style="color: #4a5568;">Uploaded on:</strong><br>
+                {{ document.uploaded_at|date:"F d, Y" }}
+            </div>
+            <div>
+                <strong style="color: #4a5568;">File type:</strong><br>
+                {{ document.file_type|upper }}
+            </div>
+            <div>
+                <strong style="color: #4a5568;">File size:</strong><br>
+                {{ document.file_size|filesizeformat }}
+            </div>
+            <div>
+                <strong style="color: #4a5568;">Status:</strong><br>
+                <span style="padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.875rem;
+                    {% if document.status == 'approved' %}background: #c6f6d5; color: #22543d;
+                    {% elif document.status == 'rejected' %}background: #fed7d7; color: #742a2a;
+                    {% elif document.status == 'under_review' %}background: #feebc8; color: #744210;
+                    {% else %}background: #e2e8f0; color: #4a5568;{% endif %}">
+                    {{ document.get_status_display }}
+                </span>
+            </div>
+        </div>
+    </div>
+    
+    <div style="margin-bottom: 2rem;">
+        <h3 style="color: #4a5568; margin-bottom: 1rem;">Description</h3>
+        <p style="color: #718096;">{{ document.description|default:"No description provided." }}</p>
+    </div>
+    
+    {% if document.author or document.category or document.tags %}
+    <div>
+        <h3 style="color: #4a5568; margin-bottom: 1rem;">Metadata</h3>
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;">
+            {% if document.author %}
+            <div>
+                <strong style="color: #4a5568;">Author:</strong><br>
+                {{ document.author }}
+            </div>
+            {% endif %}
+            {% if document.category %}
+            <div>
+                <strong style="color: #4a5568;">Category:</strong><br>
+                {{ document.category }}
+            </div>
+            {% endif %}
+            {% if document.tags %}
+            <div style="grid-column: span 2;">
+                <strong style="color: #4a5568;">Tags:</strong><br>
+                {% for tag in document.tags.split %}
+                    <span style="display: inline-block; padding: 0.25rem 0.75rem; background: #e2e8f0; border-radius: 9999px; margin-right: 0.5rem; font-size: 0.875rem;">
+                        {{ tag }}
+                    </span>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+    
+    {% if document.uploader == user %}
+    <div style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid #e2e8f0;">
+        <a href="{% url 'documents:delete' document.id %}" class="btn" style="background: #f56565;" 
+           onclick="return confirm('Are you sure you want to delete this document?')">
+            Delete Document
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

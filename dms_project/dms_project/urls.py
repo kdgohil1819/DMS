@@ -2,6 +2,8 @@
 from django.contrib import admin
 from django.urls import path, include
 from django.shortcuts import redirect
+from django.conf import settings
+from django.conf.urls.static import static
 from django.contrib.auth import views as auth_views
 
 def home_redirect(request):
@@ -15,4 +17,8 @@ urlpatterns = [
     path('accounts/', include('accounts.urls')),
     # Add this line - it will catch any redirect to 'login'
     path('login/', auth_views.LoginView.as_view(), name='login'),
+     path('documents/', include('documents.urls')),  # Add this line
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
