@@ -29,13 +29,13 @@ class Document(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField(blank=True)
     file = models.FileField(upload_to=document_upload_path)
-    file_type = models.CharField(max_length=10, choices=SUPPORTED_FORMATS)
-    file_size = models.IntegerField(help_text="File size in bytes", editable=False)
+    file_type = models.CharField(max_length=10, choices=SUPPORTED_FORMATS, default='pdf')
+    file_size = models.IntegerField(help_text="File size in bytes", editable=False, default=0)
     
     # Metadata for search (R-3.1)
     author = models.CharField(max_length=100, blank=True)
     category = models.CharField(max_length=100, blank=True)
-    tags = models.CharField(max_length=500, blank=True, help_text="Comma-separated tags")
+    tags =  models.CharField(max_length=500, blank=True, help_text="Comma-separated tags", default='')
     
     # Relationships
     uploader = models.ForeignKey(User, on_delete=models.CASCADE, related_name='documents')
