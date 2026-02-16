@@ -132,6 +132,8 @@ LOGIN_REDIRECT_URL = '/accounts/dashboard'
 LOGOUT_REDIRECT_URL = '/accounts/login/'
 LOGIN_URL = '/accounts/login/'
 
+#session not working 
+
 # TEMPORARY - Add at the bottom of settings.py to debug
 print(f"BASE_DIR: {BASE_DIR}")
 print(f"Templates path: {BASE_DIR / 'templates'}")
