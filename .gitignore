@@ -16,7 +16,11 @@ __pycache__/
 *.sqlite3
 *.db
 db.sqlite3
-
+# MySQL - ADD THESE NEW ENTRIES
+*.my.cnf
+*.cnf
+my.cnf
+.mysql_history
 # Django
 *.log
 local_settings.py
@@ -40,3 +44,6 @@ media/
 dist/
 build/
 *.egg-info/
+
+# Add this to .gitignore
+*.json

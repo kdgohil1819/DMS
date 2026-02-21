@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 # dms_project/settings.py
 
-import os  # Add this at the top if not present
+import os 
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -39,7 +39,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    # Your apps - these are the folders we created
     'accounts',
     'documents',
     'search',
@@ -61,7 +60,7 @@ ROOT_URLCONF = 'dms_project.urls'
 
 TEMPLATES = [
     { 'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],  # CRITICAL: This must be exactly this
+        'DIRS': [BASE_DIR / 'templates'],  
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -82,8 +81,16 @@ WSGI_APPLICATION = 'dms_project.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'dms_db',                 # Database name you created
+        'USER': 'dms_user',                # MySQL username
+        'PASSWORD': 'Dms@2024secure',      # MySQL password (use yours)
+        'HOST': '127.0.0.1',                # CRITICAL: Use 127.0.0.1 NOT localhost
+        'PORT': '3306',                      # MySQL default port
+        'OPTIONS': {
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES', character_set_connection=utf8mb4, collation_connection=utf8mb4_unicode_ci",
+            'charset': 'utf8mb4',
+        },
     }
 }
 
@@ -132,9 +139,4 @@ LOGIN_REDIRECT_URL = '/accounts/dashboard'
 LOGOUT_REDIRECT_URL = '/accounts/login/'
 LOGIN_URL = '/accounts/login/'
 
-#session not working 
-
-# TEMPORARY - Add at the bottom of settings.py to debug
-print(f"BASE_DIR: {BASE_DIR}")
-print(f"Templates path: {BASE_DIR / 'templates'}")
-print(f"Does templates folder exist? {(BASE_DIR / 'templates').exists()}")
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
