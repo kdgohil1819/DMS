@@ -1,28 +1,50 @@
 {% extends 'base/base.html' %}
 
 {% block content %}
+
+<!-- 🔒 Force redirect if page restored from back/forward cache -->
+<script>
+    window.onpageshow = function (event) {
+        // Detect back/forward navigation (bfcache restore)
+        if (event.persisted || performance.getEntriesByType("navigation")[0].type === "back_forward") {
+            window.location.href = "{% url 'accounts:login' %}";
+        }
+    };
+</script>
+
 <div class="card">
     <h2 style="color: #4a5568; margin-bottom: 1rem;">Dashboard</h2>
-    <p style="color: #718096; margin-bottom: 2rem;">Welcome back, <strong>{{ user.username }}</strong>!</p>
+    <p style="color: #718096; margin-bottom: 2rem;">
+        Welcome back, <strong>{{ user.username }}</strong>!
+    </p>
     
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
+        
         <div style="background: #f7fafc; padding: 1.5rem; border-radius: 8px;">
             <h3 style="color: #4a5568; margin-bottom: 1rem;">Upload Document</h3>
             <p style="color: #718096; margin-bottom: 1rem;">Upload new documents to the system</p>
-            <a href="{% url 'documents:upload' %}" class="btn" style="text-decoration: none;">Upload</a>
+            <a href="{% url 'documents:upload' %}" class="btn" style="text-decoration: none;">
+                Upload
+            </a>
         </div>
         
         <div style="background: #f7fafc; padding: 1.5rem; border-radius: 8px;">
             <h3 style="color: #4a5568; margin-bottom: 1rem;">My Documents</h3>
             <p style="color: #718096; margin-bottom: 1rem;">View and manage your uploaded documents</p>
-            <a href="{% url 'documents:my_documents' %}" class="btn" style="text-decoration: none; background: #9f7aea;">View</a>
+            <a href="{% url 'documents:my_documents' %}" class="btn" style="text-decoration: none; background: #9f7aea;">
+                View
+            </a>
         </div>
         
         <div style="background: #f7fafc; padding: 1.5rem; border-radius: 8px;">
             <h3 style="color: #4a5568; margin-bottom: 1rem;">Search Documents</h3>
             <p style="color: #718096; margin-bottom: 1rem;">Find documents by title, author, or category</p>
-            <a href="#" class="btn btn-secondary" style="text-decoration: none;">Search</a>
+            <a href="#" class="btn btn-secondary" style="text-decoration: none;">
+                Search
+            </a>
         </div>
+        
     </div>
 </div>
+
 {% endblock %}
