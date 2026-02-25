@@ -35,5 +35,5 @@ python manage.py migrate
 
   backing up data from SQLite:
   python manage.py dumpdata --natural-foreign --natural-primary -e contenttypes -e auth.Permission --indent 4 | Set-Content datadump.json -Encoding UTF8
-
+add something
   
