@@ -1,0 +1,22 @@
+{% if recent_documents %}
+<div style="background: #f7fafc; padding: 1.5rem; border-radius: 8px;">
+    <h3 style="color: #4a5568; margin-bottom: 1rem;">Recent Documents</h3>
+    <div style="display: grid; gap: 0.75rem;">
+        {% for doc in recent_documents %}
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem; background: white; border-radius: 4px;">
+            <div>
+                <a href="{% url 'documents:detail' doc.id %}" style="color: #667eea; text-decoration: none; font-weight: 500;">
+                    {{ doc.title }}
+                </a>
+                <br>
+                <small style="color: #718096;">{{ doc.uploaded_at|timesince }} ago • {{ doc.file_type|upper }}</small>
+            </div>
+            <a href="{% url 'documents:download' doc.id %}" style="color: #48bb78;">Download</a>
+        </div>
+        {% endfor %}
+    </div>
+    <div style="margin-top: 1rem; text-align: right;">
+        <a href="{% url 'search:search' %}" style="color: #667eea;">View All →</a>
+    </div>
+</div>
+{% endif %}

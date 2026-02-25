@@ -11,39 +11,46 @@
         }
     };
 </script>
-
 <div class="card">
     <h2 style="color: #4a5568; margin-bottom: 1rem;">Dashboard</h2>
-    <p style="color: #718096; margin-bottom: 2rem;">
-        Welcome back, <strong>{{ user.username }}</strong>!
-    </p>
+    <p style="color: #718096; margin-bottom: 2rem;">Welcome back, <strong>{{ user.username }}</strong>!</p>
     
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
-        
+    <!-- Quick Search -->
+    <div style="margin-bottom: 2rem;">
+        <form action="{% url 'search:search' %}" method="get" style="display: flex; gap: 1rem;">
+            <input type="text" name="q" placeholder="Quick search your documents..." 
+                   style="flex: 1; padding: 0.75rem; border: 2px solid #e2e8f0; border-radius: 6px;">
+            <button type="submit" class="btn">Search</button>
+            <a href="{% url 'search:search' %}" class="btn" style="background: #6c757d;">Advanced</a>
+        </form>
+    </div>
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
+        <!-- Upload Card -->
         <div style="background: #f7fafc; padding: 1.5rem; border-radius: 8px;">
             <h3 style="color: #4a5568; margin-bottom: 1rem;">Upload Document</h3>
             <p style="color: #718096; margin-bottom: 1rem;">Upload new documents to the system</p>
-            <a href="{% url 'documents:upload' %}" class="btn" style="text-decoration: none;">
-                Upload
-            </a>
+            <a href="{% url 'documents:upload' %}" class="btn">Upload</a>
         </div>
         
+        <!-- My Documents Card -->
         <div style="background: #f7fafc; padding: 1.5rem; border-radius: 8px;">
             <h3 style="color: #4a5568; margin-bottom: 1rem;">My Documents</h3>
-            <p style="color: #718096; margin-bottom: 1rem;">View and manage your uploaded documents</p>
-            <a href="{% url 'documents:my_documents' %}" class="btn" style="text-decoration: none; background: #9f7aea;">
-                View
-            </a>
+            <p style="color: #718096; margin-bottom: 1rem;">View and manage your documents</p>
+            <a href="{% url 'documents:my_documents' %}" class="btn" style="background: #9f7aea;">View</a>
         </div>
         
+        <!-- Search Card -->
         <div style="background: #f7fafc; padding: 1.5rem; border-radius: 8px;">
             <h3 style="color: #4a5568; margin-bottom: 1rem;">Search Documents</h3>
-            <p style="color: #718096; margin-bottom: 1rem;">Find documents by title, author, or category</p>
-            <a href="#" class="btn btn-secondary" style="text-decoration: none;">
-                Search
-            </a>
+            <p style="color: #718096; margin-bottom: 1rem;">Advanced search with filters</p>
+            <a href="{% url 'search:search' %}" class="btn" style="background: #48bb78;">Search</a>
         </div>
-        
+    </div>
+    
+    <!-- Recent Documents Section -->
+    <div style="margin-top: 2rem;">
+        {% include 'search/recent.html' %}
     </div>
 </div>
 

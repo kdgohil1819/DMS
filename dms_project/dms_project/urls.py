@@ -18,6 +18,7 @@ urlpatterns = [
     # Add this line - it will catch any redirect to 'login'
     path('login/', auth_views.LoginView.as_view(), name='login'),
      path('documents/', include('documents.urls')),  # Add this line
+     path('search/', include('search.urls')),
 ]
 
 if settings.DEBUG:

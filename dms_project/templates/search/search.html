@@ -1,0 +1,150 @@
+{% extends 'base/base.html' %}
+
+{% block content %}
+<div class="card">
+    <h2 style="color: #4a5568; margin-bottom: 2rem;">Search Documents</h2>
+    
+    <!-- Search Form -->
+    <form method="get" action="{% url 'search:search' %}" style="margin-bottom: 2rem;">
+        <div style="display: grid; grid-template-columns: 1fr auto; gap: 1rem; margin-bottom: 1rem;">
+            <input type="text" name="q" value="{{ query }}" placeholder="Search by title, author, description, tags..." 
+                   style="padding: 0.75rem; border: 2px solid #e2e8f0; border-radius: 6px; font-size: 1rem;">
+            <button type="submit" class="btn" style="background: #667eea;">Search</button>
+        </div>
+        
+        <!-- Advanced Filters (Collapsible) -->
+        <details style="margin-top: 1rem; padding: 1rem; background: #f7fafc; border-radius: 6px;">
+            <summary style="cursor: pointer; color: #4a5568; font-weight: 600;">Advanced Filters</summary>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1rem;">
+                <!-- Date Range -->
+                <div>
+                    <label style="display: block; margin-bottom: 0.5rem;">From Date:</label>
+                    <input type="date" name="date_from" value="{{ date_from }}" 
+                           style="width: 100%; padding: 0.5rem; border: 1px solid #cbd5e0; border-radius: 4px;">
+                </div>
+                <div>
+                    <label style="display: block; margin-bottom: 0.5rem;">To Date:</label>
+                    <input type="date" name="date_to" value="{{ date_to }}" 
+                           style="width: 100%; padding: 0.5rem; border: 1px solid #cbd5e0; border-radius: 4px;">
+                </div>
+                
+                <!-- File Type -->
+                <div>
+                    <label style="display: block; margin-bottom: 0.5rem;">File Type:</label>
+                    <select name="file_type" style="width: 100%; padding: 0.5rem; border: 1px solid #cbd5e0; border-radius: 4px;">
+                        <option value="">All Types</option>
+                        {% for type in file_types %}
+                        <option value="{{ type }}" {% if selected_file_type == type %}selected{% endif %}>{{ type|upper }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <!-- Category -->
+                <div>
+                    <label style="display: block; margin-bottom: 0.5rem;">Category:</label>
+                    <select name="category" style="width: 100%; padding: 0.5rem; border: 1px solid #cbd5e0; border-radius: 4px;">
+                        <option value="">All Categories</option>
+                        {% for cat in categories %}
+                        <option value="{{ cat }}" {% if selected_category == cat %}selected{% endif %}>{{ cat }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <!-- Sort By -->
+                <div>
+                    <label style="display: block; margin-bottom: 0.5rem;">Sort By:</label>
+                    <select name="sort" style="width: 100%; padding: 0.5rem; border: 1px solid #cbd5e0; border-radius: 4px;">
+                        <option value="-uploaded_at" {% if sort_by == '-uploaded_at' %}selected{% endif %}>Newest First</option>
+                        <option value="uploaded_at" {% if sort_by == 'uploaded_at' %}selected{% endif %}>Oldest First</option>
+                        <option value="title" {% if sort_by == 'title' %}selected{% endif %}>Title (A-Z)</option>
+                        <option value="-title" {% if sort_by == '-title' %}selected{% endif %}>Title (Z-A)</option>
+                        <option value="-file_size" {% if sort_by == '-file_size' %}selected{% endif %}>Largest First</option>
+                        <option value="file_size" {% if sort_by == 'file_size' %}selected{% endif %}>Smallest First</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div style="margin-top: 1rem; text-align: right;">
+                <a href="{% url 'search:search' %}" class="btn" style="background: #6c757d;">Clear Filters</a>
+                <button type="submit" class="btn" style="background: #48bb78;">Apply Filters</button>
+            </div>
+        </details>
+    </form>
+    
+    <!-- Results Count -->
+    <div style="margin-bottom: 1rem; color: #4a5568;">
+        Found <strong>{{ total_results }}</strong> document{{ total_results|pluralize }}
+    </div>
+    
+    <!-- Results Table -->
+    {% if documents %}
+    <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="background: #f7fafc;">
+                    <th style="padding: 1rem; text-align: left;">Title</th>
+                    <th style="padding: 1rem; text-align: left;">Type</th>
+                    <th style="padding: 1rem; text-align: left;">Size</th>
+                    <th style="padding: 1rem; text-align: left;">Uploaded</th>
+                    <th style="padding: 1rem; text-align: left;">Category</th>
+                    <th style="padding: 1rem; text-align: left;">Status</th>
+                    <th style="padding: 1rem; text-align: left;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for doc in documents %}
+                <tr style="border-bottom: 1px solid #e2e8f0;">
+                    <td style="padding: 1rem;">
+                        <a href="{% url 'documents:detail' doc.id %}" style="color: #667eea; text-decoration: none;">
+                            {{ doc.title }}
+                        </a>
+                    </td>
+                    <td style="padding: 1rem;">{{ doc.file_type|upper }}</td>
+                    <td style="padding: 1rem;">{{ doc.file_size|filesizeformat }}</td>
+                    <td style="padding: 1rem;">{{ doc.uploaded_at|date:"M d, Y" }}</td>
+                    <td style="padding: 1rem;">{{ doc.category|default:"-" }}</td>
+                    <td style="padding: 1rem;">
+                        <span style="padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.875rem;
+                            {% if doc.status == 'approved' %}background: #c6f6d5; color: #22543d;
+                            {% elif doc.status == 'rejected' %}background: #fed7d7; color: #742a2a;
+                            {% elif doc.status == 'under_review' %}background: #feebc8; color: #744210;
+                            {% else %}background: #e2e8f0; color: #4a5568;{% endif %}">
+                            {{ doc.get_status_display }}
+                        </span>
+                    </td>
+                    <td style="padding: 1rem;">
+                        <a href="{% url 'documents:detail' doc.id %}" style="margin-right: 1rem; color: #667eea;">View</a>
+                        <a href="{% url 'documents:download' doc.id %}" style="color: #48bb78;">Download</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+    <!-- Pagination -->
+    {% if documents.has_other_pages %}
+    <div style="margin-top: 2rem; display: flex; justify-content: center; gap: 0.5rem;">
+        {% if documents.has_previous %}
+            <a href="?q={{ query }}&page={{ documents.previous_page_number }}" class="btn" style="padding: 0.5rem 1rem;">&laquo;</a>
+        {% endif %}
+        
+        <span style="padding: 0.5rem 1rem; background: #667eea; color: white; border-radius: 4px;">
+            Page {{ documents.number }} of {{ documents.paginator.num_pages }}
+        </span>
+        
+        {% if documents.has_next %}
+            <a href="?q={{ query }}&page={{ documents.next_page_number }}" class="btn" style="padding: 0.5rem 1rem;">&raquo;</a>
+        {% endif %}
+    </div>
+    {% endif %}
+    
+    {% else %}
+    <div style="text-align: center; padding: 3rem; background: #f7fafc; border-radius: 8px;">
+        <p style="color: #718096; margin-bottom: 1rem;">No documents found matching your search.</p>
+        <a href="{% url 'documents:upload' %}" class="btn">Upload a Document</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
