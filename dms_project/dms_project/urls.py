@@ -19,6 +19,7 @@ urlpatterns = [
     path('login/', auth_views.LoginView.as_view(), name='login'),
      path('documents/', include('documents.urls')),  # Add this line
      path('search/', include('search.urls')),
+     path('review/', include('review.urls')),
 ]
 
 if settings.DEBUG:

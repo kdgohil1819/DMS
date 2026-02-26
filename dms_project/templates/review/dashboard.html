@@ -1,0 +1,143 @@
+{% extends 'base/base.html' %}
+
+{% block content %}
+<div class="card">
+    <h2 style="color: #4a5568; margin-bottom: 2rem;">Review Dashboard</h2>
+    
+    <!-- Statistics Cards -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+        <div style="background: #f7fafc; padding: 1.5rem; border-radius: 8px; text-align: center;">
+            <div style="font-size: 2rem; font-weight: bold; color: #667eea;">{{ stats.pending }}</div>
+            <div style="color: #4a5568;">Pending Review</div>
+        </div>
+        <div style="background: #f7fafc; padding: 1.5rem; border-radius: 8px; text-align: center;">
+            <div style="font-size: 2rem; font-weight: bold; color: #48bb78;">{{ stats.approved_today }}</div>
+            <div style="color: #4a5568;">Approved Today</div>
+        </div>
+        <div style="background: #f7fafc; padding: 1.5rem; border-radius: 8px; text-align: center;">
+            <div style="font-size: 2rem; font-weight: bold; color: #ed8936;">{{ stats.my_pending }}</div>
+            <div style="color: #4a5568;">My Assignments</div>
+        </div>
+    </div>
+    
+    <!-- My Assignments -->
+    <div style="margin-bottom: 2rem;">
+        <h3 style="color: #4a5568; margin-bottom: 1rem;">📋 My Assignments</h3>
+        {% if my_assignments %}
+            <div style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="background: #f7fafc;">
+                            <th style="padding: 1rem; text-align: left;">Document</th>
+                            <th style="padding: 1rem; text-align: left;">Uploader</th>
+                            <th style="padding: 1rem; text-align: left;">Uploaded</th>
+                            <th style="padding: 1rem; text-align: left;">Due Date</th>
+                            <th style="padding: 1rem; text-align: left;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for assignment in my_assignments %}
+                        <tr style="border-bottom: 1px solid #e2e8f0;">
+                            <td style="padding: 1rem;">{{ assignment.document.title }}</td>
+                            <td style="padding: 1rem;">{{ assignment.document.uploader.username }}</td>
+                            <td style="padding: 1rem;">{{ assignment.document.uploaded_at|date:"M d, Y" }}</td>
+                            <td style="padding: 1rem;">
+                                {% if assignment.due_date %}
+                                    {{ assignment.due_date|date:"M d, Y" }}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                            <td style="padding: 1rem;">
+                                <a href="{% url 'review:review_document' assignment.document.id %}" 
+                                   class="btn" style="background: #667eea;">Review</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p style="color: #718096;">No documents assigned to you.</p>
+        {% endif %}
+    </div>
+    
+    <!-- Pending Documents -->
+    <div style="margin-bottom: 2rem;">
+        <h3 style="color: #4a5568; margin-bottom: 1rem;">⏳ Pending Documents</h3>
+        {% if pending_documents %}
+            <div style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="background: #f7fafc;">
+                            <th style="padding: 1rem; text-align: left;">Document</th>
+                            <th style="padding: 1rem; text-align: left;">Uploader</th>
+                            <th style="padding: 1rem; text-align: left;">Uploaded</th>
+                            <th style="padding: 1rem; text-align: left;">Type</th>
+                            <th style="padding: 1rem; text-align: left;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for doc in pending_documents %}
+                        <tr style="border-bottom: 1px solid #e2e8f0;">
+                            <td style="padding: 1rem;">{{ doc.title }}</td>
+                            <td style="padding: 1rem;">{{ doc.uploader.username }}</td>
+                            <td style="padding: 1rem;">{{ doc.uploaded_at|date:"M d, Y" }}</td>
+                            <td style="padding: 1rem;">{{ doc.file_type|upper }}</td>
+                            <td style="padding: 1rem;">
+                                <a href="{% url 'review:review_document' doc.id %}" 
+                                   class="btn" style="background: #48bb78;">Review</a>
+                                {% if user.is_superuser %}
+                                <a href="{% url 'review:assign_reviewer' doc.id %}" 
+                                   class="btn" style="background: #6c757d;">Assign</a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p style="color: #718096;">No pending documents.</p>
+        {% endif %}
+    </div>
+    
+    <!-- Recent Reviews -->
+    <div>
+        <h3 style="color: #4a5568; margin-bottom: 1rem;">📜 Recent Reviews</h3>
+        {% if recent_reviews %}
+            <div style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="background: #f7fafc;">
+                            <th style="padding: 1rem; text-align: left;">Document</th>
+                            <th style="padding: 1rem; text-align: left;">Status</th>
+                            <th style="padding: 1rem; text-align: left;">Comments</th>
+                            <th style="padding: 1rem; text-align: left;">Reviewed</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for review in recent_reviews %}
+                        <tr style="border-bottom: 1px solid #e2e8f0;">
+                            <td style="padding: 1rem;">{{ review.document.title }}</td>
+                            <td style="padding: 1rem;">
+                                <span style="padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.875rem;
+                                    {% if review.status == 'approved' %}background: #c6f6d5; color: #22543d;
+                                    {% elif review.status == 'rejected' %}background: #fed7d7; color: #742a2a;
+                                    {% else %}background: #e2e8f0; color: #4a5568;{% endif %}">
+                                    {{ review.get_status_display }}
+                                </span>
+                            </td>
+                            <td style="padding: 1rem;">{{ review.comments|truncatechars:50 }}</td>
+                            <td style="padding: 1rem;">{{ review.created_at|timesince }} ago</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p style="color: #718096;">No recent reviews.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -76,6 +76,40 @@
     </div>
     {% endif %}
     
+    <!-- ===== NEW SECTION 1: Rejected Document Resubmission ===== -->
+    <!-- Add this section for rejected documents -->
+    {% if document.status == 'rejected' and document.uploader == user %}
+    <div style="margin-top: 2rem; padding: 1.5rem; background: #fed7d7; border-radius: 8px;">
+        <h3 style="color: #742a2a; margin-bottom: 1rem;">Document Rejected</h3>
+        <p style="color: #742a2a; margin-bottom: 1rem;">
+            This document has been rejected. You can resubmit it after making changes.
+        </p>
+        <a href="{% url 'review:resubmit' document.id %}" class="btn" style="background: #f56565;">Resubmit Document</a>
+    </div>
+    {% endif %}
+    
+    <!-- ===== NEW SECTION 2: Review History Link ===== -->
+    <!-- Add this section to show review history link -->
+    {% if document.reviews.exists %}
+    <div style="margin-top: 1rem;">
+        <a href="{% url 'review:history' document.id %}" style="color: #667eea;">View Review History →</a>
+    </div>
+    {% endif %}
+    
+    <!-- ===== NEW SECTION 3: Staff Review Actions ===== -->
+    <!-- Add this section for staff users to review -->
+    {% if user.is_staff and document.status != 'approved' and document.status != 'rejected' %}
+    <div style="margin-top: 2rem; padding: 1.5rem; background: #f0f4f8; border-radius: 8px;">
+        <h3 style="color: #4a5568; margin-bottom: 1rem;">Staff Actions</h3>
+        <div style="display: flex; gap: 1rem;">
+            <a href="{% url 'review:review_document' document.id %}" class="btn" style="background: #667eea;">Review Document</a>
+            {% if user.is_superuser %}
+            <a href="{% url 'review:assign_reviewer' document.id %}" class="btn" style="background: #9f7aea;">Assign Reviewer</a>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+    
     {% if document.uploader == user %}
     <div style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid #e2e8f0;">
         <a href="{% url 'documents:delete' document.id %}" class="btn" style="background: #f56565;" 
