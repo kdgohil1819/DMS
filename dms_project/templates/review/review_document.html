@@ -1,0 +1,116 @@
+{% extends 'base/base.html' %}
+
+{% block content %}
+<div class="card" style="max-width: 800px; margin: 0 auto;">
+    <h2 style="color: #4a5568; margin-bottom: 2rem;">Review Document</h2>
+    
+    <!-- Document Info -->
+    <div style="background: #f7fafc; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;">
+        <h3 style="color: #4a5568; margin-bottom: 1rem;">{{ document.title }}</h3>
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;">
+            <div>
+                <strong>Uploaded by:</strong> {{ document.uploader.username }}
+            </div>
+            <div>
+                <strong>Uploaded on:</strong> {{ document.uploaded_at|date:"F d, Y" }}
+            </div>
+            <div>
+                <strong>File type:</strong> {{ document.file_type|upper }}
+            </div>
+            <div>
+                <strong>File size:</strong> {{ document.file_size|filesizeformat }}
+            </div>
+            {% if document.author %}
+            <div>
+                <strong>Author:</strong> {{ document.author }}
+            </div>
+            {% endif %}
+            {% if document.category %}
+            <div>
+                <strong>Category:</strong> {{ document.category }}
+            </div>
+            {% endif %}
+        </div>
+        {% if document.description %}
+        <div style="margin-top: 1rem;">
+            <strong>Description:</strong><br>
+            {{ document.description }}
+        </div>
+        {% endif %}
+        <div style="margin-top: 1rem;">
+            <a href="{% url 'documents:download' document.id %}" class="btn" style="background: #48bb78;">Download Document</a>
+        </div>
+    </div>
+    
+    <!-- Review Form -->
+    <div style="margin-bottom: 2rem;">
+        <h3 style="color: #4a5568; margin-bottom: 1rem;">Submit Review</h3>
+        <form method="post">
+            {% csrf_token %}
+            
+            <div style="margin-bottom: 1.5rem;">
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Decision:</label>
+                {{ form.status }}
+            </div>
+            
+            <div class="form-group">
+                <label for="id_comments">Review Comments:</label>
+                {{ form.comments }}
+                <small style="color: #718096;">Provide feedback for the document owner</small>
+            </div>
+            
+            <button type="submit" class="btn">Submit Review</button>
+            <a href="{% url 'review:dashboard' %}" class="btn" style="background: #6c757d;">Cancel</a>
+        </form>
+    </div>
+    
+    <!-- Review History -->
+    {% if review_history %}
+    <div>
+        <h3 style="color: #4a5568; margin-bottom: 1rem;">Review History</h3>
+        <div style="border-left: 3px solid #e2e8f0; padding-left: 1.5rem;">
+            {% for review in review_history %}
+            <div style="margin-bottom: 1.5rem;">
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <span style="padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.875rem;
+                        {% if review.status == 'approved' %}background: #c6f6d5; color: #22543d;
+                        {% elif review.status == 'rejected' %}background: #fed7d7; color: #742a2a;
+                        {% else %}background: #e2e8f0; color: #4a5568;{% endif %}">
+                        {{ review.get_status_display }}
+                    </span>
+                    <span style="color: #718096;">by {{ review.reviewer.username }}</span>
+                    <span style="color: #a0aec0;">{{ review.created_at|timesince }} ago</span>
+                </div>
+                {% if review.comments %}
+                <p style="margin-top: 0.5rem; color: #4a5568;">{{ review.comments }}</p>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        color: #4a5568;
+    }
+    .form-group textarea {
+        width: 100%;
+        padding: 0.75rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 6px;
+        font-size: 1rem;
+    }
+    .form-group textarea:focus {
+        outline: none;
+        border-color: #667eea;
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,46 @@
+{% extends 'base/base.html' %}
+
+{% block content %}
+<div class="card" style="max-width: 500px; margin: 0 auto;">
+    <h2 style="color: #4a5568; margin-bottom: 2rem;">Assign Reviewer</h2>
+    
+    <p style="margin-bottom: 1rem;">Document: <strong>{{ document.title }}</strong></p>
+    
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label for="id_assigned_to">Assign to:</label>
+            {{ form.assigned_to }}
+        </div>
+        
+        <div class="form-group">
+            <label for="id_due_date">Due Date (optional):</label>
+            {{ form.due_date }}
+        </div>
+        
+        <button type="submit" class="btn">Assign</button>
+        <a href="{% url 'review:dashboard' %}" class="btn" style="background: #6c757d;">Cancel</a>
+    </form>
+</div>
+
+<style>
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        color: #4a5568;
+    }
+    .form-group select,
+    .form-group input {
+        width: 100%;
+        padding: 0.75rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 6px;
+        font-size: 1rem;
+    }
+</style>
+{% endblock %}

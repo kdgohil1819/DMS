@@ -1,0 +1,65 @@
+{% extends 'base/base.html' %}
+
+{% block content %}
+<div class="card" style="max-width: 600px; margin: 0 auto;">
+    <h2 style="color: #4a5568; margin-bottom: 2rem;">Resubmit Document</h2>
+    
+    <!-- Last Rejection Feedback -->
+    {% if last_rejection %}
+    <div style="background: #fed7d7; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;">
+        <h3 style="color: #742a2a; margin-bottom: 0.5rem;">Reviewer Feedback</h3>
+        <p style="color: #742a2a;">{{ last_rejection.comments }}</p>
+        <small style="color: #742a2a;">Reviewed by {{ last_rejection.reviewer.username }} on {{ last_rejection.created_at|date:"F d, Y" }}</small>
+    </div>
+    {% endif %}
+    
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label for="id_description">Description:</label>
+            {{ form.description }}
+        </div>
+        
+        <div class="form-group">
+            <label for="id_tags">Tags:</label>
+            {{ form.tags }}
+            <small>Separate tags with commas</small>
+        </div>
+        
+        <div class="form-group">
+            <label for="id_resubmission_note">Resubmission Note:</label>
+            {{ form.resubmission_note }}
+            <small>Explain what changes you've made</small>
+        </div>
+        
+        <button type="submit" class="btn">Resubmit Document</button>
+        <a href="{% url 'documents:detail' document.id %}" class="btn" style="background: #6c757d;">Cancel</a>
+    </form>
+</div>
+
+<style>
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        color: #4a5568;
+    }
+    .form-group input,
+    .form-group textarea {
+        width: 100%;
+        padding: 0.75rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 6px;
+        font-size: 1rem;
+    }
+    .form-group input:focus,
+    .form-group textarea:focus {
+        outline: none;
+        border-color: #667eea;
+    }
+</style>
+{% endblock %}

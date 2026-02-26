@@ -1,0 +1,45 @@
+{% extends 'base/base.html' %}
+
+{% block content %}
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+        <h2 style="color: #4a5568;">Review History: {{ document.title }}</h2>
+        <a href="{% url 'documents:detail' document.id %}" class="btn" style="background: #6c757d;">Back to Document</a>
+    </div>
+    
+    {% if reviews %}
+    <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="background: #f7fafc;">
+                    <th style="padding: 1rem; text-align: left;">Date</th>
+                    <th style="padding: 1rem; text-align: left;">Reviewer</th>
+                    <th style="padding: 1rem; text-align: left;">Status</th>
+                    <th style="padding: 1rem; text-align: left;">Comments</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for review in reviews %}
+                <tr style="border-bottom: 1px solid #e2e8f0;">
+                    <td style="padding: 1rem;">{{ review.created_at|date:"M d, Y H:i" }}</td>
+                    <td style="padding: 1rem;">{{ review.reviewer.username }}</td>
+                    <td style="padding: 1rem;">
+                        <span style="padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.875rem;
+                            {% if review.status == 'approved' %}background: #c6f6d5; color: #22543d;
+                            {% elif review.status == 'rejected' %}background: #fed7d7; color: #742a2a;
+                            {% elif review.status == 'resubmitted' %}background: #feebc8; color: #744210;
+                            {% else %}background: #e2e8f0; color: #4a5568;{% endif %}">
+                            {{ review.get_status_display }}
+                        </span>
+                    </td>
+                    <td style="padding: 1rem;">{{ review.comments|default:"-" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p style="color: #718096;">No review history available.</p>
+    {% endif %}
+</div>
+{% endblock %}
