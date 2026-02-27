@@ -27,6 +27,10 @@ Install all required packages
 pip install -r requirements.txt
 Run Migrations:
 python manage.py migrate
+
+for style run this command:
+python manage.py collectstatic
+
   then create superuser for server access;
   python manage.py createsuperuser
 
