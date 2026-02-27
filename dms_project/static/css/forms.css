@@ -1,0 +1,95 @@
+/* ===== FORM PAGES STYLES ===== */
+
+.form-container {
+    max-width: 500px;
+    margin: 2rem auto;
+}
+
+.form-card {
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.form-title {
+    text-align: center;
+    margin-bottom: 2rem;
+    color: #333;
+}
+
+/* Login/Register specific */
+.role-selection {
+    display: flex;
+    gap: 2rem;
+    margin: 1.5rem 0;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 4px;
+}
+
+.role-option {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.role-option input[type="radio"] {
+    width: auto;
+    margin-right: 0.5rem;
+}
+
+.role-badge-select {
+    padding: 0.25rem 1rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+}
+
+.role-badge-select.admin {
+    background: #007bff;
+    color: white;
+}
+
+.role-badge-select.user {
+    background: #6c757d;
+    color: white;
+}
+
+/* Profile Page */
+.profile-info {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+}
+
+.profile-field {
+    margin-bottom: 1rem;
+}
+
+.profile-field label {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 0.25rem;
+    color: #333;
+}
+
+.profile-field .field-value {
+    padding: 0.5rem;
+    background: white;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+}
+
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+/* Password strength indicator */
+.password-hint {
+    font-size: 0.875rem;
+    color: #6c757d;
+    margin-top: 0.25rem;
+}

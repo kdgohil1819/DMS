@@ -1,0 +1,134 @@
+/* ===== DOCUMENTS PAGES STYLES ===== */
+
+/* Upload Page */
+.upload-container {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.file-info {
+    background: #f8f9fa;
+    padding: 1rem;
+    border-radius: 4px;
+    margin-bottom: 1.5rem;
+    font-size: 0.9rem;
+    color: #6c757d;
+}
+
+/* Document List */
+.document-filters {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+}
+
+.filter-input {
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    min-width: 200px;
+}
+
+.document-table {
+    width: 100%;
+    background: white;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.document-table th {
+    background: #f8f9fa;
+    padding: 1rem;
+    text-align: left;
+}
+
+.document-table td {
+    padding: 1rem;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.document-actions {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.action-view {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.action-download {
+    color: #28a745;
+    text-decoration: none;
+}
+
+.action-delete {
+    color: #dc3545;
+    text-decoration: none;
+}
+
+.action-view:hover,
+.action-download:hover,
+.action-delete:hover {
+    text-decoration: underline;
+}
+
+/* Document Detail */
+.document-detail {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.detail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.detail-title {
+    font-size: 2rem;
+    color: #333;
+}
+
+.detail-actions {
+    display: flex;
+    gap: 1rem;
+}
+
+.detail-section {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+}
+
+.detail-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+}
+
+.detail-label {
+    font-weight: bold;
+    color: #333;
+}
+
+.detail-value {
+    color: #6c757d;
+}
+
+.metadata-section {
+    margin-top: 2rem;
+}
+
+.tag {
+    display: inline-block;
+    background: #e9ecef;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    margin-right: 0.5rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+}
