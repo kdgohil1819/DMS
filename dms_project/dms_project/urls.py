@@ -20,6 +20,7 @@ urlpatterns = [
      path('documents/', include('documents.urls')),  # Add this line
      path('search/', include('search.urls')),
      path('review/', include('review.urls')),
+     path('access/', include('access.urls')),
 ]
 
 if settings.DEBUG:
