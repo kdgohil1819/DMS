@@ -2,19 +2,35 @@
 
 {% block content %}
 <h2>Login</h2>
+
 <form method="post">
     {% csrf_token %}
+
+    <!-- Role Selection -->
+    <div>
+        <label><strong>Role:</strong></label><br>
+        <input type="radio" name="role" value="admin" required> Admin
+        <input type="radio" name="role" value="user" required> User
+    </div>
+    <br>
+
     <div>
         <label>Username:</label><br>
         <input type="text" name="username" required>
     </div>
     <br>
+
     <div>
         <label>Password:</label><br>
         <input type="password" name="password" required>
     </div>
     <br>
+
     <button type="submit">Login</button>
-    <p>Don't have account? <a href="{% url 'accounts:register' %}">Register here</a></p>
+
+    <p>Don't have account?
+        <a href="{% url 'accounts:register' %}">Register here</a>
+    </p>
 </form>
+
 {% endblock %}
