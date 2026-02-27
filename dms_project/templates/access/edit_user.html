@@ -1,0 +1,121 @@
+{% extends 'base/base.html' %}
+
+{% block content %}
+<div class="card" style="max-width: 600px; margin: 0 auto;">
+    <h2 style="color: #4a5568; margin-bottom: 2rem;">Edit User: {{ edit_user.username }}</h2>
+    
+    <form method="post">
+        {% csrf_token %}
+        
+        <h3 style="color: #4a5568; margin: 1.5rem 0 1rem;">Basic Information</h3>
+        
+        <div class="form-group">
+            <label>Username:</label>
+            <input type="text" value="{{ edit_user.username }}" disabled style="background: #f7fafc;">
+        </div>
+        
+        <div class="form-group">
+            <label>Email:</label>
+            <input type="email" name="email" value="{{ edit_user.email }}" required>
+        </div>
+        
+        <div class="form-row">
+            <div class="form-group half">
+                <label>First Name:</label>
+                <input type="text" name="first_name" value="{{ edit_user.first_name }}">
+            </div>
+            <div class="form-group half">
+                <label>Last Name:</label>
+                <input type="text" name="last_name" value="{{ edit_user.last_name }}">
+            </div>
+        </div>
+        
+        <h3 style="color: #4a5568; margin: 1.5rem 0 1rem;">Role & Profile</h3>
+        
+        <div class="form-group">
+            <label>Role:</label>
+            <select name="role">
+                {% for role_code, role_name in roles %}
+                <option value="{{ role_code }}" {% if profile.role == role_code %}selected{% endif %}>
+                    {{ role_name }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label>Department:</label>
+            <input type="text" name="department" value="{{ profile.department }}">
+        </div>
+        
+        <div class="form-group">
+            <label>Phone:</label>
+            <input type="text" name="phone" value="{{ profile.phone }}">
+        </div>
+        
+        <div class="form-group">
+            <label>Bio:</label>
+            <textarea name="bio" rows="3">{{ profile.bio }}</textarea>
+        </div>
+        
+        <h3 style="color: #4a5568; margin: 1.5rem 0 1rem;">Account Status</h3>
+        
+        <div class="checkbox-group">
+            <label>
+                <input type="checkbox" name="is_active" {% if edit_user.is_active %}checked{% endif %}>
+                Account Active
+            </label>
+        </div>
+        
+        <div style="margin-top: 2rem;">
+            <button type="submit" class="btn">Update User</button>
+            <a href="{% url 'access:user_list' %}" class="btn" style="background: #6c757d;">Cancel</a>
+        </div>
+    </form>
+</div>
+
+<style>
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        color: #4a5568;
+    }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        width: 100%;
+        padding: 0.75rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 6px;
+        font-size: 1rem;
+    }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+        outline: none;
+        border-color: #667eea;
+    }
+    .form-row {
+        display: flex;
+        gap: 1rem;
+    }
+    .form-row .half {
+        flex: 1;
+    }
+    .checkbox-group {
+        padding: 0.75rem;
+        background: #f7fafc;
+        border-radius: 6px;
+    }
+    .checkbox-group label {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        cursor: pointer;
+    }
+</style>
+{% endblock %}

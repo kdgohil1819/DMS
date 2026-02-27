@@ -1,11 +1,11 @@
 {% extends 'base/base.html' %}
 
 {% block content %}
-<h2>Admin Dashboard</h2>
-<p>Welcome Admin, {{ user.username }}!</p>
-
-<div>
-    <a href="/admin/">Go to Django Admin Panel</a>
+<div class="card">
+    <h2>Quick Admin Panel</h2>
+    <p>Welcome Admin, {{ user.username }}!</p>
+    <div style="display: flex; gap: 1rem;">
+        <a href="{% url 'access:admin_dashboard' %}" class="btn">Full Admin Dashboard →</a>
+    </div>
 </div>
-
 {% endblock %}

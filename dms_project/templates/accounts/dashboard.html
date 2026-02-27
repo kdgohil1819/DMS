@@ -1,57 +1,337 @@
 {% extends 'base/base.html' %}
 
 {% block content %}
-
-<!-- 🔒 Force redirect if page restored from back/forward cache -->
-<script>
-    window.onpageshow = function (event) {
-        // Detect back/forward navigation (bfcache restore)
-        if (event.persisted || performance.getEntriesByType("navigation")[0].type === "back_forward") {
-            window.location.href = "{% url 'accounts:login' %}";
-        }
-    };
-</script>
-<div class="card">
-    <h2 style="color: #4a5568; margin-bottom: 1rem;">Dashboard</h2>
-    <p style="color: #718096; margin-bottom: 2rem;">Welcome back, <strong>{{ user.username }}</strong>!</p>
+<div class="user-dashboard">
+    <!-- Welcome Header -->
+    <div class="welcome-header">
+        <div>
+            <h1 class="welcome-title">Welcome back, <span class="username">{{ user.username }}</span>!</h1>
+            <p class="welcome-subtitle">Here's what's happening with your documents today.</p>
+        </div>
+        <div class="user-badge">
+            <span class="badge-icon">👤</span>
+            {{ user.profile.get_role_display|default:"User" }}
+        </div>
+    </div>
     
     <!-- Quick Search -->
-    <div style="margin-bottom: 2rem;">
-        <form action="{% url 'search:search' %}" method="get" style="display: flex; gap: 1rem;">
-            <input type="text" name="q" placeholder="Quick search your documents..." 
-                   style="flex: 1; padding: 0.75rem; border: 2px solid #e2e8f0; border-radius: 6px;">
-            <button type="submit" class="btn">Search</button>
-            <a href="{% url 'search:search' %}" class="btn" style="background: #6c757d;">Advanced</a>
+    <div class="quick-search">
+        <form action="{% url 'search:search' %}" method="get" class="search-form">
+            <input type="text" name="q" placeholder="🔍 Quick search your documents by title, author, or tags..." 
+                   class="search-input">
+            <button type="submit" class="search-btn">Search</button>
+            <a href="{% url 'search:search' %}" class="advanced-btn">Advanced</a>
         </form>
     </div>
     
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
-        <!-- Upload Card -->
-        <div style="background: #f7fafc; padding: 1.5rem; border-radius: 8px;">
-            <h3 style="color: #4a5568; margin-bottom: 1rem;">Upload Document</h3>
-            <p style="color: #718096; margin-bottom: 1rem;">Upload new documents to the system</p>
-            <a href="{% url 'documents:upload' %}" class="btn">Upload</a>
-        </div>
+    <!-- Quick Actions Grid -->
+    <div class="actions-grid">
+        <a href="{% url 'documents:upload' %}" class="action-card upload">
+            <div class="action-icon">📤</div>
+            <div class="action-content">
+                <h3 class="action-title">Upload Document</h3>
+                <p class="action-desc">Upload new documents to the system</p>
+                <span class="action-link">Upload →</span>
+            </div>
+        </a>
         
-        <!-- My Documents Card -->
-        <div style="background: #f7fafc; padding: 1.5rem; border-radius: 8px;">
-            <h3 style="color: #4a5568; margin-bottom: 1rem;">My Documents</h3>
-            <p style="color: #718096; margin-bottom: 1rem;">View and manage your documents</p>
-            <a href="{% url 'documents:my_documents' %}" class="btn" style="background: #9f7aea;">View</a>
-        </div>
+        <a href="{% url 'documents:my_documents' %}" class="action-card documents">
+            <div class="action-icon">📁</div>
+            <div class="action-content">
+                <h3 class="action-title">My Documents</h3>
+                <p class="action-desc">View and manage your uploaded documents</p>
+                <span class="action-link">View All →</span>
+            </div>
+        </a>
         
-        <!-- Search Card -->
-        <div style="background: #f7fafc; padding: 1.5rem; border-radius: 8px;">
-            <h3 style="color: #4a5568; margin-bottom: 1rem;">Search Documents</h3>
-            <p style="color: #718096; margin-bottom: 1rem;">Advanced search with filters</p>
-            <a href="{% url 'search:search' %}" class="btn" style="background: #48bb78;">Search</a>
-        </div>
+        <a href="{% url 'search:search' %}" class="action-card search">
+            <div class="action-icon">🔍</div>
+            <div class="action-content">
+                <h3 class="action-title">Search Documents</h3>
+                <p class="action-desc">Advanced search with filters and sorting</p>
+                <span class="action-link">Search →</span>
+            </div>
+        </a>
     </div>
     
-    <!-- Recent Documents Section -->
-    <div style="margin-top: 2rem;">
+    <!-- Admin/Manager Tools (Conditional) -->
+    {% if user.is_staff or user.profile.role == 'admin' or user.profile.role == 'manager' %}
+    <div class="admin-tools">
+        <h2 class="section-title">⚙️ Management Tools</h2>
+        <div class="admin-actions">
+            <a href="{% url 'access:user_list' %}" class="admin-action">
+                <span class="admin-icon">👥</span>
+                <span class="admin-text">Manage Users</span>
+            </a>
+            <a href="{% url 'review:dashboard' %}" class="admin-action">
+                <span class="admin-icon">📋</span>
+                <span class="admin-text">Review Queue</span>
+            </a>
+            <a href="{% url 'access:admin_dashboard' %}" class="admin-action">
+                <span class="admin-icon">📊</span>
+                <span class="admin-text">Admin Dashboard</span>
+            </a>
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- Recent Documents -->
+    <div class="recent-documents">
+        <div class="section-header">
+            <h2 class="section-title">📄 Recent Documents</h2>
+            <a href="{% url 'documents:my_documents' %}" class="view-all">View All →</a>
+        </div>
+        
         {% include 'search/recent.html' %}
     </div>
+    
+<!-- Quick Stats - FIXED VERSION -->
+<div class="quick-stats">
+    <div class="stat-item">
+        <div class="stat-value">{{ user.documents.count|default:"0" }}</div>
+        <div class="stat-label">Total Documents</div>
+    </div>
+    <div class="stat-item">
+        <div class="stat-value">{{ approved_count|default:"0" }}</div>
+        <div class="stat-label">Approved</div>
+    </div>
+    <div class="stat-item">
+        <div class="stat-value">{{ pending_count|default:"0" }}</div>
+        <div class="stat-label">Pending</div>
+    </div>
 </div>
-
+<style>
+    /* User Dashboard Styles */
+    .user-dashboard {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+    
+    .welcome-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 2px solid #e2e8f0;
+    }
+    
+    .welcome-title {
+        font-size: 2rem;
+        color: #4a5568;
+        margin: 0 0 0.25rem 0;
+    }
+    
+    .username {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    
+    .welcome-subtitle {
+        color: #718096;
+        margin: 0;
+    }
+    
+    .user-badge {
+        background: #f7fafc;
+        padding: 0.5rem 1rem;
+        border-radius: 50px;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        border: 1px solid #e2e8f0;
+    }
+    
+    .badge-icon {
+        font-size: 1.2rem;
+    }
+    
+    .quick-search {
+        margin-bottom: 2rem;
+    }
+    
+    .search-form {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+    
+    .search-input {
+        flex: 1;
+        min-width: 250px;
+        padding: 0.75rem 1rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: border-color 0.3s;
+    }
+    
+    .search-input:focus {
+        outline: none;
+        border-color: #667eea;
+    }
+    
+    .search-btn {
+        padding: 0.75rem 1.5rem;
+        background: #667eea;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 500;
+    }
+    
+    .advanced-btn {
+        padding: 0.75rem 1.5rem;
+        background: #6c757d;
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+    }
+    
+    .actions-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .action-card {
+        display: flex;
+        gap: 1rem;
+        padding: 1.5rem;
+        background: white;
+        border-radius: 12px;
+        text-decoration: none;
+        border: 1px solid #e2e8f0;
+        transition: all 0.3s;
+    }
+    
+    .action-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    
+    .action-card.upload:hover {
+        border-color: #667eea;
+    }
+    
+    .action-card.documents:hover {
+        border-color: #9f7aea;
+    }
+    
+    .action-card.search:hover {
+        border-color: #48bb78;
+    }
+    
+    .action-icon {
+        font-size: 2.5rem;
+    }
+    
+    .action-content {
+        flex: 1;
+    }
+    
+    .action-title {
+        color: #4a5568;
+        margin: 0 0 0.25rem 0;
+        font-size: 1.2rem;
+    }
+    
+    .action-desc {
+        color: #718096;
+        margin: 0 0 0.5rem 0;
+        font-size: 0.9rem;
+    }
+    
+    .action-link {
+        color: #667eea;
+        font-weight: 500;
+        font-size: 0.9rem;
+    }
+    
+    .admin-tools {
+        background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+        padding: 1.5rem;
+        border-radius: 12px;
+        margin-bottom: 2rem;
+    }
+    
+    .admin-actions {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+    
+    .admin-action {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1.5rem;
+        background: white;
+        border-radius: 8px;
+        text-decoration: none;
+        color: #4a5568;
+        border: 1px solid #e2e8f0;
+        transition: all 0.2s;
+    }
+    
+    .admin-action:hover {
+        background: #667eea;
+        color: white;
+        border-color: #667eea;
+    }
+    
+    .admin-icon {
+        font-size: 1.2rem;
+    }
+    
+    .recent-documents {
+        margin-bottom: 2rem;
+    }
+    
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+    
+    .section-title {
+        color: #4a5568;
+        font-size: 1.3rem;
+        margin: 0;
+    }
+    
+    .view-all {
+        color: #667eea;
+        text-decoration: none;
+    }
+    
+    .quick-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 1rem;
+        background: #f7fafc;
+        padding: 1.5rem;
+        border-radius: 12px;
+    }
+    
+    .stat-item {
+        text-align: center;
+    }
+    
+    .stat-value {
+        font-size: 2rem;
+        font-weight: bold;
+        color: #4a5568;
+    }
+    
+    .stat-label {
+        color: #718096;
+        font-size: 0.9rem;
+    }
+</style>
 {% endblock %}

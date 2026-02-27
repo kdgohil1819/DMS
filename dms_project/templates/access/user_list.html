@@ -1,0 +1,77 @@
+{% extends 'base/base.html' %}
+
+{% block content %}
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+        <h2 style="color: #4a5568;">User Management</h2>
+        <a href="{% url 'access:create_user' %}" class="btn">+ Create New User</a>
+    </div>
+    
+    <!-- Filter by Role -->
+    <div style="margin-bottom: 2rem;">
+        <form method="get" style="display: flex; gap: 1rem; align-items: center;">
+            <label>Filter by Role:</label>
+            <select name="role" onchange="this.form.submit()" style="padding: 0.5rem;">
+                <option value="">All Roles</option>
+                {% for role_code, role_name in roles %}
+                <option value="{{ role_code }}" {% if role_filter == role_code %}selected{% endif %}>
+                    {{ role_name }}
+                </option>
+                {% endfor %}
+            </select>
+            {% if role_filter %}
+            <a href="{% url 'access:user_list' %}" style="color: #667eea;">Clear Filter</a>
+            {% endif %}
+        </form>
+    </div>
+    
+    <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="background: #f7fafc;">
+                    <th style="padding: 1rem; text-align: left;">Username</th>
+                    <th style="padding: 1rem; text-align: left;">Email</th>
+                    <th style="padding: 1rem; text-align: left;">Role</th>
+                    <th style="padding: 1rem; text-align: left;">Department</th>
+                    <th style="padding: 1rem; text-align: left;">Status</th>
+                    <th style="padding: 1rem; text-align: left;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr style="border-bottom: 1px solid #e2e8f0;">
+                    <td style="padding: 1rem;">{{ user.username }}</td>
+                    <td style="padding: 1rem;">{{ user.email }}</td>
+                    <td style="padding: 1rem;">
+                        <span style="padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.875rem;
+                            {% if user.profile.role == 'admin' %}background: #667eea; color: white;
+                            {% elif user.profile.role == 'manager' %}background: #48bb78; color: white;
+                            {% elif user.profile.role == 'reviewer' %}background: #9f7aea; color: white;
+                            {% else %}background: #e2e8f0; color: #4a5568;{% endif %}">
+                            {{ user.profile.get_role_display }}
+                        </span>
+                    </td>
+                    <td style="padding: 1rem;">{{ user.profile.department|default:"-" }}</td>
+                    <td style="padding: 1rem;">
+                        <span style="padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.875rem;
+                            {% if user.is_active %}background: #c6f6d5; color: #22543d;{% else %}background: #fed7d7; color: #742a2a;{% endif %}">
+                            {{ user.is_active|yesno:"Active,Inactive" }}
+                        </span>
+                    </td>
+                    <td style="padding: 1rem;">
+                        <a href="{% url 'access:edit_user' user.id %}" style="color: #667eea; margin-right: 1rem;">Edit</a>
+                        <a href="{% url 'access:user_permissions' user.id %}" style="color: #48bb78;">Permissions</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" style="padding: 2rem; text-align: center; color: #718096;">
+                        No users found.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

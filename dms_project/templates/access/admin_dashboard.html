@@ -1,0 +1,456 @@
+{% extends 'base/base.html' %}
+
+{% block content %}
+<div class="admin-dashboard">
+    <!-- Header with Role Badge -->
+    <div class="dashboard-header">
+        <div>
+            <h1 class="page-title">Admin Dashboard</h1>
+            <p class="welcome-text">Welcome back, <strong>{{ user.username }}</strong>! Here's what's happening with your system.</p>
+        </div>
+        <div class="role-badge">
+            <span class="role-icon">👑</span>
+            {{ user.profile.get_role_display|default:"Admin" }}
+        </div>
+    </div>
+    
+    <!-- Statistics Cards -->
+    <div class="stats-grid">
+        <div class="stat-card users">
+            <div class="stat-icon">👥</div>
+            <div class="stat-content">
+                <div class="stat-value">{{ total_users|default:"0" }}</div>
+                <div class="stat-label">Total Users</div>
+                <a href="{% url 'access:user_list' %}" class="stat-link">View All →</a>
+            </div>
+        </div>
+        
+        <div class="stat-card documents">
+            <div class="stat-icon">📄</div>
+            <div class="stat-content">
+                <div class="stat-value">{{ total_documents|default:"0" }}</div>
+                <div class="stat-label">Total Documents</div>
+                <a href="{% url 'documents:my_documents' %}" class="stat-link">View All →</a>
+            </div>
+        </div>
+        
+        <div class="stat-card reviews">
+            <div class="stat-icon">📋</div>
+            <div class="stat-content">
+                <div class="stat-value">{{ pending_reviews|default:"0" }}</div>
+                <div class="stat-label">Pending Reviews</div>
+                <a href="{% url 'review:dashboard' %}" class="stat-link">Review →</a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Quick Actions -->
+    <div class="quick-actions">
+        <h2 class="section-title">⚡ Quick Actions</h2>
+        <div class="actions-grid">
+            <a href="{% url 'access:create_user' %}" class="action-card">
+                <span class="action-icon">➕</span>
+                <span class="action-text">Create New User</span>
+            </a>
+            <a href="{% url 'access:role_list' %}" class="action-card">
+                <span class="action-icon">👥</span>
+                <span class="action-text">Manage Roles</span>
+            </a>
+            <a href="{% url 'documents:upload' %}" class="action-card">
+                <span class="action-icon">📤</span>
+                <span class="action-text">Upload Document</span>
+            </a>
+            <a href="{% url 'review:dashboard' %}" class="action-card">
+                <span class="action-icon">📋</span>
+                <span class="action-text">Review Queue</span>
+            </a>
+            <a href="/admin/" class="action-card">
+                <span class="action-icon">⚙️</span>
+                <span class="action-text">Django Admin</span>
+            </a>
+        </div>
+    </div>
+    
+    <!-- Recent Users -->
+    <div class="recent-section">
+        <div class="section-header">
+            <h2 class="section-title">👥 Recent Users</h2>
+            <a href="{% url 'access:user_list' %}" class="view-all">View All →</a>
+        </div>
+        
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user_item in recent_users %}
+                    <tr>
+                        <td class="username">{{ user_item.username }}</td>
+                        <td>{{ user_item.email }}</td>
+                        <td>
+                            <span class="role-badge {{ user_item.profile.role }}">
+                                {{ user_item.profile.get_role_display|default:"User" }}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="status-badge {% if user_item.is_active %}active{% else %}inactive{% endif %}">
+                                {{ user_item.is_active|yesno:"Active,Inactive" }}
+                            </span>
+                        </td>
+                        <td class="actions">
+                            <a href="{% url 'access:edit_user' user_item.id %}" class="action-link edit">Edit</a>
+                            <a href="{% url 'access:user_permissions' user_item.id %}" class="action-link perms">Permissions</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="empty-message">No users found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- Document Overview -->
+    <div class="recent-section">
+        <h2 class="section-title">📊 Document Overview</h2>
+        <div class="document-stats">
+            <div class="doc-stat-card pending">
+                <div class="doc-stat-value">{{ doc_stats.pending|default:"0" }}</div>
+                <div class="doc-stat-label">Pending</div>
+            </div>
+            <div class="doc-stat-card under-review">
+                <div class="doc-stat-value">{{ doc_stats.under_review|default:"0" }}</div>
+                <div class="doc-stat-label">Under Review</div>
+            </div>
+            <div class="doc-stat-card approved">
+                <div class="doc-stat-value">{{ doc_stats.approved|default:"0" }}</div>
+                <div class="doc-stat-label">Approved</div>
+            </div>
+            <div class="doc-stat-card rejected">
+                <div class="doc-stat-value">{{ doc_stats.rejected|default:"0" }}</div>
+                <div class="doc-stat-label">Rejected</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Admin Dashboard Styles */
+    .admin-dashboard {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+    
+    .dashboard-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+    
+    .page-title {
+        font-size: 2rem;
+        color: #4a5568;
+        margin: 0 0 0.5rem 0;
+    }
+    
+    .welcome-text {
+        color: #718096;
+        margin: 0;
+    }
+    
+    .role-badge {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border-radius: 50px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        box-shadow: 0 4px 6px rgba(102, 126, 234, 0.25);
+    }
+    
+    .role-icon {
+        font-size: 1.2rem;
+    }
+    
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .stat-card {
+        padding: 1.5rem;
+        border-radius: 12px;
+        color: white;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        transition: transform 0.2s;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-2px);
+    }
+    
+    .stat-card.users {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    .stat-card.documents {
+        background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+    }
+    
+    .stat-card.reviews {
+        background: linear-gradient(135deg, #f6ad55 0%, #ed8936 100%);
+    }
+    
+    .stat-icon {
+        font-size: 2.5rem;
+        opacity: 0.9;
+    }
+    
+    .stat-content {
+        flex: 1;
+    }
+    
+    .stat-value {
+        font-size: 2rem;
+        font-weight: bold;
+        line-height: 1.2;
+    }
+    
+    .stat-label {
+        font-size: 0.9rem;
+        opacity: 0.9;
+        margin-bottom: 0.5rem;
+    }
+    
+    .stat-link {
+        color: white;
+        text-decoration: underline;
+        font-size: 0.9rem;
+        opacity: 0.9;
+    }
+    
+    .stat-link:hover {
+        opacity: 1;
+    }
+    
+    .quick-actions {
+        background: #f7fafc;
+        padding: 2rem;
+        border-radius: 12px;
+        margin-bottom: 2rem;
+    }
+    
+    .section-title {
+        color: #4a5568;
+        margin-top: 0;
+        margin-bottom: 1.5rem;
+        font-size: 1.3rem;
+    }
+    
+    .actions-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 1rem;
+    }
+    
+    .action-card {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 8px;
+        text-align: center;
+        text-decoration: none;
+        color: #4a5568;
+        border: 1px solid #e2e8f0;
+        transition: all 0.2s;
+    }
+    
+    .action-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        border-color: #667eea;
+    }
+    
+    .action-icon {
+        font-size: 2rem;
+        display: block;
+        margin-bottom: 0.5rem;
+    }
+    
+    .action-text {
+        font-weight: 500;
+    }
+    
+    .recent-section {
+        margin-bottom: 2rem;
+    }
+    
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+    
+    .view-all {
+        color: #667eea;
+        text-decoration: none;
+    }
+    
+    .table-responsive {
+        overflow-x: auto;
+        background: white;
+        border-radius: 8px;
+        border: 1px solid #e2e8f0;
+    }
+    
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    .data-table th {
+        background: #f7fafc;
+        padding: 1rem;
+        text-align: left;
+        font-weight: 600;
+        color: #4a5568;
+        border-bottom: 2px solid #e2e8f0;
+    }
+    
+    .data-table td {
+        padding: 1rem;
+        border-bottom: 1px solid #e2e8f0;
+        color: #718096;
+    }
+    
+    .data-table tr:hover td {
+        background: #f7fafc;
+    }
+    
+    .username {
+        font-weight: 500;
+        color: #4a5568;
+    }
+    
+    .role-badge.admin {
+        background: #667eea;
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: 9999px;
+        font-size: 0.875rem;
+    }
+    
+    .role-badge.manager {
+        background: #48bb78;
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: 9999px;
+        font-size: 0.875rem;
+    }
+    
+    .role-badge.user {
+        background: #e2e8f0;
+        color: #4a5568;
+        padding: 0.25rem 0.75rem;
+        border-radius: 9999px;
+        font-size: 0.875rem;
+    }
+    
+    .status-badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 9999px;
+        font-size: 0.875rem;
+    }
+    
+    .status-badge.active {
+        background: #c6f6d5;
+        color: #22543d;
+    }
+    
+    .status-badge.inactive {
+        background: #fed7d7;
+        color: #742a2a;
+    }
+    
+    .actions {
+        display: flex;
+        gap: 0.75rem;
+    }
+    
+    .action-link {
+        text-decoration: none;
+        font-size: 0.875rem;
+    }
+    
+    .action-link.edit {
+        color: #667eea;
+    }
+    
+    .action-link.perms {
+        color: #48bb78;
+    }
+    
+    .empty-message {
+        text-align: center;
+        padding: 2rem;
+        color: #a0aec0;
+    }
+    
+    .document-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 1rem;
+    }
+    
+    .doc-stat-card {
+        background: #f7fafc;
+        padding: 1.5rem;
+        border-radius: 8px;
+        text-align: center;
+        border-left: 4px solid;
+    }
+    
+    .doc-stat-card.pending {
+        border-left-color: #667eea;
+    }
+    
+    .doc-stat-card.under-review {
+        border-left-color: #ed8936;
+    }
+    
+    .doc-stat-card.approved {
+        border-left-color: #48bb78;
+    }
+    
+    .doc-stat-card.rejected {
+        border-left-color: #f56565;
+    }
+    
+    .doc-stat-value {
+        font-size: 2rem;
+        font-weight: bold;
+        color: #4a5568;
+    }
+    
+    .doc-stat-label {
+        color: #718096;
+        font-size: 0.9rem;
+    }
+</style>
+{% endblock %}

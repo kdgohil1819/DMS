@@ -1,36 +1,65 @@
 {% extends 'base/base.html' %}
 
 {% block content %}
-<h2>Login</h2>
+<div class="card" style="max-width: 500px; margin: 0 auto;">
+    <h2 style="color: #4a5568; margin-bottom: 2rem;">Login</h2>
+    
+    <form method="post">
+        {% csrf_token %}
+        
+        <!-- Role Selection -->
+        <div style="margin-bottom: 1.5rem;">
+            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Role:</label>
+            <div style="display: flex; gap: 2rem;">
+                <label style="display: flex; align-items: center; gap: 0.5rem;">
+                    <input type="radio" name="role" value="admin" required>
+                    <span style="background: #667eea; color: white; padding: 0.25rem 1rem; border-radius: 20px;">Admin</span>
+                </label>
+                <label style="display: flex; align-items: center; gap: 0.5rem;">
+                    <input type="radio" name="role" value="user" required checked>
+                    <span style="background: #e2e8f0; color: #4a5568; padding: 0.25rem 1rem; border-radius: 20px;">User</span>
+                </label>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label for="username">Username:</label>
+            <input type="text" name="username" id="username" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="password">Password:</label>
+            <input type="password" name="password" id="password" required>
+        </div>
+        
+        <button type="submit" class="btn">Login</button>
+        
+        <p style="margin-top: 1rem;">
+            Don't have account? <a href="{% url 'accounts:register' %}">Register here</a>
+        </p>
+    </form>
+</div>
 
-<form method="post">
-    {% csrf_token %}
-
-    <!-- Role Selection -->
-    <div>
-        <label><strong>Role:</strong></label><br>
-        <input type="radio" name="role" value="admin" required> Admin
-        <input type="radio" name="role" value="user" required> User
-    </div>
-    <br>
-
-    <div>
-        <label>Username:</label><br>
-        <input type="text" name="username" required>
-    </div>
-    <br>
-
-    <div>
-        <label>Password:</label><br>
-        <input type="password" name="password" required>
-    </div>
-    <br>
-
-    <button type="submit">Login</button>
-
-    <p>Don't have account?
-        <a href="{% url 'accounts:register' %}">Register here</a>
-    </p>
-</form>
-
+<style>
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        color: #4a5568;
+    }
+    .form-group input {
+        width: 100%;
+        padding: 0.75rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 6px;
+        font-size: 1rem;
+    }
+    .form-group input:focus {
+        outline: none;
+        border-color: #667eea;
+    }
+</style>
 {% endblock %}
