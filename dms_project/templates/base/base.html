@@ -7,43 +7,54 @@
     {% block extra_css %}{% endblock %}
 </head>
 <body>
+
     <div class="navbar">
-        <a href="{% url 'accounts:dashboard' %}">Dashboard</a>
-        <a href="{% url 'documents:my_documents' %}">My Documents</a>
-        <a href="{% url 'documents:upload' %}">Upload</a>
-        <a href="{% url 'search:search' %}">Search</a>
-        
-        {% if user.is_staff or user.profile.role == 'admin' or user.profile.role == 'manager' %}
-        <a href="{% url 'access:user_list' %}">Users</a>
+
+        {% if user.is_authenticated %}
+            <!-- Normal User Links -->
+            <a href="{% url 'accounts:dashboard' %}">Dashboard</a>
+            <a href="{% url 'documents:my_documents' %}">My Documents</a>
+            <a href="{% url 'documents:upload' %}">Upload</a>
+            <a href="{% url 'search:search' %}">Search</a>
+
+            <!-- Staff Only -->
+            {% if user.is_staff %}
+                <a href="{% url 'review:dashboard' %}">Review</a>
+            {% endif %}
+
+            <!-- Superuser Only -->
+            {% if user.is_superuser %}
+                <a href="{% url 'access:user_list' %}">Users</a>
+                <a href="{% url 'accounts:admin_dashboard' %}">Admin</a>
+            {% endif %}
         {% endif %}
-        
-        {% if user.is_superuser or user.profile.role == 'admin' %}
-        <a href="{% url 'access:admin_dashboard' %}">Admin</a>
-        {% endif %}
-        
-        {% if user.is_staff or user.profile.role == 'reviewer' or user.profile.role == 'admin' %}
-        <a href="{% url 'review:dashboard' %}">Review</a>
-        {% endif %}
-        
+
+        <!-- Right Side Navigation -->
         <div class="nav-right">
             {% if user.is_authenticated %}
                 <a href="{% url 'access:my_profile' %}">Profile</a>
-                <a href="{% url 'accounts:logout' %}">Logout ({{ user.username }})</a>
+                <a href="{% url 'accounts:logout' %}">
+                    Logout ({{ user.username }})
+                </a>
             {% else %}
                 <a href="{% url 'accounts:login' %}">Login</a>
                 <a href="{% url 'accounts:register' %}">Register</a>
             {% endif %}
         </div>
+
     </div>
 
     <div class="container">
         {% if messages %}
             {% for message in messages %}
-                <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
             {% endfor %}
         {% endif %}
-        
+
         {% block content %}{% endblock %}
     </div>
+
 </body>
 </html>
