@@ -59,26 +59,7 @@
         </a>
     </div>
     
-    <!-- Admin/Manager Tools (Conditional) -->
-    {% if user.is_staff or user.profile.role == 'admin' or user.profile.role == 'manager' %}
-    <div class="admin-tools">
-        <h2 class="section-title">⚙️ Management Tools</h2>
-        <div class="admin-actions">
-            <a href="{% url 'access:user_list' %}" class="admin-action">
-                <span>👥</span>
-                <span>Manage Users</span>
-            </a>
-            <a href="{% url 'review:dashboard' %}" class="admin-action">
-                <span>📋</span>
-                <span>Review Queue</span>
-            </a>
-            <a href="{% url 'access:admin_dashboard' %}" class="admin-action">
-                <span>📊</span>
-                <span>Admin Dashboard</span>
-            </a>
-        </div>
-    </div>
-    {% endif %}
+   
     
     <!-- Recent Documents -->
     <div class="recent-documents">
