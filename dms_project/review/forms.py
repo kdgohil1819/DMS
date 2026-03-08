@@ -36,16 +36,51 @@ class AssignmentForm(forms.ModelForm):
         self.fields['due_date'].required = False
 
 class ResubmissionForm(forms.ModelForm):
-    """R-4.2: Form for resubmitting rejected documents"""
-    class Meta:
-        model = Document
-        fields = ['description', 'tags']  # Allow updating metadata
-        widgets = {
-            'description': forms.Textarea(attrs={'rows': 3}),
-        }
+    """Form for resubmitting rejected documents with NEW file option"""
+    
+    # Add a file field for new upload
+    new_file = forms.FileField(
+        required=False,
+        label="Upload Corrected File (Optional)",
+        help_text="Upload a new version of your document if needed"
+    )
     
     resubmission_note = forms.CharField(
-        widget=forms.Textarea(attrs={'rows': 2, 'placeholder': 'Explain what you changed...'}),
+        widget=forms.Textarea(attrs={
+            'rows': 3, 
+            'placeholder': 'Explain what changes you made...'
+        }),
         required=True,
         label="Resubmission Note"
     )
+    
+    class Meta:
+        model = Document
+        fields = ['title', 'description', 'author', 'category', 'tags']
+        widgets = {
+            'title': forms.TextInput(attrs={'class': 'form-control'}),
+            'description': forms.Textarea(attrs={'rows': 3, 'class': 'form-control'}),
+            'author': forms.TextInput(attrs={'class': 'form-control'}),
+            'category': forms.Select(attrs={'class': 'form-control'}),
+            'tags': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'e.g., report, confidential, draft'
+            }),
+        }
+    
+    def clean_new_file(self):
+        """Validate the new file if uploaded"""
+        new_file = self.cleaned_data.get('new_file')
+        if new_file:
+            # Check file size (max 10MB)
+            if new_file.size > 10 * 1024 * 1024:
+                raise forms.ValidationError("File size must be less than 10MB")
+            
+            # Check file extension
+            ext = new_file.name.split('.')[-1].lower()
+            valid_extensions = ['pdf', 'docx', 'xlsx', 'txt', 'jpg', 'png']
+            if ext not in valid_extensions:
+                raise forms.ValidationError(
+                    f"Unsupported file format. Please upload: {', '.join(valid_extensions)}"
+                )
+        return new_file

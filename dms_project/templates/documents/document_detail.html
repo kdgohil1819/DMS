@@ -77,25 +77,35 @@
     </div>
     {% endif %}
     
-    <!-- ===== NEW SECTION 1: Rejected Document Resubmission ===== -->
-    <!-- Add this section for rejected documents -->
-    {% if document.status == 'rejected' and document.uploader == user %}
-    <div style="margin-top: 2rem; padding: 1.5rem; background: #fed7d7; border-radius: 8px;">
-        <h3 style="color: #742a2a; margin-bottom: 1rem;">Document Rejected</h3>
-        <p style="color: #742a2a; margin-bottom: 1rem;">
-            This document has been rejected. You can resubmit it after making changes.
-        </p>
-        <a href="{% url 'review:resubmit' document.id %}" class="btn" style="background: #f56565;">Resubmit Document</a>
+   <!-- Rejected Document Section -->
+{% if document.status == 'rejected' and document.uploader == user %}
+<div style="margin-top: 2rem; padding: 1.5rem; background: #f8d7da; border: 1px solid #f5c6cb; border-radius: 8px;">
+    <h3 style="color: #721c24; margin-bottom: 1rem;">Document Rejected</h3>
+    
+    <!-- Show rejection feedback -->
+    {% if last_rejection %}
+    <div style="background: white; padding: 1rem; border-radius: 4px; margin-bottom: 1rem;">
+        <strong>Reviewer Feedback:</strong>
+        <p>{{ last_rejection.comments }}</p>
+        <small>Reviewed by {{ last_rejection.reviewer.username }} on {{ last_rejection.created_at|date:"F d, Y" }}</small>
     </div>
     {% endif %}
     
-    <!-- ===== NEW SECTION 2: Review History Link ===== -->
-    <!-- Add this section to show review history link -->
-    {% if document.reviews.exists %}
-    <div style="margin-top: 1rem;">
-        <a href="{% url 'review:history' document.id %}" style="color: #667eea;">View Review History →</a>
-    </div>
-    {% endif %}
+    <p style="color: #721c24; margin-bottom: 1rem;">
+        This document has been rejected. You can upload a corrected version or update the metadata below.
+    </p>
+    <a href="{% url 'review:resubmit' document.id %}" class="btn" style="background: #dc3545; color: white;">
+        Resubmit Document with Corrections
+    </a>
+</div>
+{% endif %}
+
+<!-- Review History Link -->
+{% if reviews %}
+<div style="margin-top: 1rem;">
+    <a href="{% url 'review:history' document.id %}" style="color: #007bff;">View Full Review History →</a>
+</div>
+{% endif %}
     
     <!-- ===== NEW SECTION 3: Staff Review Actions ===== -->
     <!-- Add this section for staff users to review -->

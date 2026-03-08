@@ -3,6 +3,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import HttpResponse, HttpResponseForbidden
+
+from review.models import Review
 from .models import Document
 from .forms import DocumentUploadForm
 import os
@@ -44,8 +46,21 @@ def document_detail(request, doc_id):
         messages.error(request, "You don't have permission to view this document.")
         return redirect('documents:my_documents')
     
+    # Get the most recent rejection review if document is rejected
+    last_rejection = None
+    if document.status == 'rejected':
+        last_rejection = Review.objects.filter(
+            document=document, 
+            status='rejected'
+        ).order_by('-created_at').first()
+    
+    # Get all reviews for history
+    reviews = document.reviews.all().order_by('-created_at')
+    
     return render(request, 'documents/document_detail.html', {
-        'document': document
+        'document': document,
+        'last_rejection': last_rejection,
+        'reviews': reviews,
     })
 
 # R-3.2.1: Download document

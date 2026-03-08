@@ -47,6 +47,7 @@ class Document(models.Model):
         ('under_review', 'Under Review'),
         ('approved', 'Approved'),
         ('rejected', 'Rejected'),
+         ('resubmitted', 'Resubmitted'), 
     ]
     
     # Basic document info
