@@ -10,10 +10,18 @@
             <div style="font-size: 2rem; font-weight: bold; color: #667eea;">{{ stats.pending }}</div>
             <div style="color: #4a5568;">Pending Review</div>
         </div>
+        
+        <!-- Resubmitted Stats Card (NEW) -->
+        <div style="background: #17a2b8; padding: 1.5rem; border-radius: 8px; text-align: center; color: white;">
+            <div style="font-size: 2rem; font-weight: bold;">{{ stats.resubmitted|default:"0" }}</div>
+            <div style="opacity: 0.9;">Resubmitted</div>
+        </div>
+        
         <div style="background: #f7fafc; padding: 1.5rem; border-radius: 8px; text-align: center;">
             <div style="font-size: 2rem; font-weight: bold; color: #48bb78;">{{ stats.approved_today }}</div>
             <div style="color: #4a5568;">Approved Today</div>
         </div>
+        
         <div style="background: #f7fafc; padding: 1.5rem; border-radius: 8px; text-align: center;">
             <div style="font-size: 2rem; font-weight: bold; color: #ed8936;">{{ stats.my_pending }}</div>
             <div style="color: #4a5568;">My Assignments</div>
@@ -31,6 +39,7 @@
                             <th style="padding: 1rem; text-align: left;">Document</th>
                             <th style="padding: 1rem; text-align: left;">Uploader</th>
                             <th style="padding: 1rem; text-align: left;">Uploaded</th>
+                            <th style="padding: 1rem; text-align: left;">Status</th>
                             <th style="padding: 1rem; text-align: left;">Due Date</th>
                             <th style="padding: 1rem; text-align: left;">Action</th>
                         </tr>
@@ -41,6 +50,17 @@
                             <td style="padding: 1rem;">{{ assignment.document.title }}</td>
                             <td style="padding: 1rem;">{{ assignment.document.uploader.username }}</td>
                             <td style="padding: 1rem;">{{ assignment.document.uploaded_at|date:"M d, Y" }}</td>
+                            <td style="padding: 1rem;">
+                                <span style="padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.875rem;
+                                    {% if assignment.document.status == 'pending' %}background: #ffc107; color: #212529;
+                                    {% elif assignment.document.status == 'resubmitted' %}background: #17a2b8; color: white;
+                                    {% elif assignment.document.status == 'under_review' %}background: #fd7e14; color: white;
+                                    {% elif assignment.document.status == 'approved' %}background: #28a745; color: white;
+                                    {% elif assignment.document.status == 'rejected' %}background: #dc3545; color: white;
+                                    {% endif %}">
+                                    {{ assignment.document.get_status_display }}
+                                </span>
+                            </td>
                             <td style="padding: 1rem;">
                                 {% if assignment.due_date %}
                                     {{ assignment.due_date|date:"M d, Y" }}
@@ -62,9 +82,9 @@
         {% endif %}
     </div>
     
-    <!-- Pending Documents -->
+    <!-- Pending Documents (including Resubmitted) -->
     <div style="margin-bottom: 2rem;">
-        <h3 style="color: #4a5568; margin-bottom: 1rem;">⏳ Pending Documents</h3>
+        <h3 style="color: #4a5568; margin-bottom: 1rem;">⏳ Pending & Resubmitted Documents</h3>
         {% if pending_documents %}
             <div style="overflow-x: auto;">
                 <table style="width: 100%; border-collapse: collapse;">
@@ -74,6 +94,7 @@
                             <th style="padding: 1rem; text-align: left;">Uploader</th>
                             <th style="padding: 1rem; text-align: left;">Uploaded</th>
                             <th style="padding: 1rem; text-align: left;">Type</th>
+                            <th style="padding: 1rem; text-align: left;">Status</th>
                             <th style="padding: 1rem; text-align: left;">Action</th>
                         </tr>
                     </thead>
@@ -84,6 +105,17 @@
                             <td style="padding: 1rem;">{{ doc.uploader.username }}</td>
                             <td style="padding: 1rem;">{{ doc.uploaded_at|date:"M d, Y" }}</td>
                             <td style="padding: 1rem;">{{ doc.file_type|upper }}</td>
+                            <td style="padding: 1rem;">
+                                <span style="padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.875rem;
+                                    {% if doc.status == 'pending' %}background: #ffc107; color: #212529;
+                                    {% elif doc.status == 'resubmitted' %}background: #17a2b8; color: white;
+                                    {% elif doc.status == 'under_review' %}background: #fd7e14; color: white;
+                                    {% elif doc.status == 'approved' %}background: #28a745; color: white;
+                                    {% elif doc.status == 'rejected' %}background: #dc3545; color: white;
+                                    {% endif %}">
+                                    {{ doc.get_status_display }}
+                                </span>
+                            </td>
                             <td style="padding: 1rem;">
                                 <a href="{% url 'review:review_document' doc.id %}" 
                                    class="btn" style="background: #48bb78;">Review</a>
@@ -98,7 +130,7 @@
                 </table>
             </div>
         {% else %}
-            <p style="color: #718096;">No pending documents.</p>
+            <p style="color: #718096;">No pending or resubmitted documents.</p>
         {% endif %}
     </div>
     
@@ -111,6 +143,7 @@
                     <thead>
                         <tr style="background: #f7fafc;">
                             <th style="padding: 1rem; text-align: left;">Document</th>
+                            <th style="padding: 1rem; text-align: left;">Reviewer</th>
                             <th style="padding: 1rem; text-align: left;">Status</th>
                             <th style="padding: 1rem; text-align: left;">Comments</th>
                             <th style="padding: 1rem; text-align: left;">Reviewed</th>
@@ -120,10 +153,12 @@
                         {% for review in recent_reviews %}
                         <tr style="border-bottom: 1px solid #e2e8f0;">
                             <td style="padding: 1rem;">{{ review.document.title }}</td>
+                            <td style="padding: 1rem;">{{ review.reviewer.username }}</td>
                             <td style="padding: 1rem;">
                                 <span style="padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.875rem;
                                     {% if review.status == 'approved' %}background: #c6f6d5; color: #22543d;
                                     {% elif review.status == 'rejected' %}background: #fed7d7; color: #742a2a;
+                                    {% elif review.status == 'resubmitted' %}background: #17a2b8; color: white;
                                     {% else %}background: #e2e8f0; color: #4a5568;{% endif %}">
                                     {{ review.get_status_display }}
                                 </span>
@@ -140,4 +175,30 @@
         {% endif %}
     </div>
 </div>
+
+<style>
+    .btn {
+        display: inline-block;
+        padding: 0.5rem 1rem;
+        border-radius: 4px;
+        text-decoration: none;
+        color: white;
+        font-size: 0.875rem;
+        transition: opacity 0.2s;
+    }
+    .btn:hover {
+        opacity: 0.8;
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    th {
+        font-weight: 600;
+    }
+    td, th {
+        padding: 0.75rem;
+        text-align: left;
+    }
+</style>
 {% endblock %}

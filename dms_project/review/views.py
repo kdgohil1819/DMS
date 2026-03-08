@@ -16,36 +16,40 @@ def is_staff_or_admin(user):
 @login_required(login_url='accounts:login')
 @user_passes_test(is_staff_or_admin)
 def review_dashboard(request):
-    """Dashboard for reviewers to see pending documents"""
+    """Dashboard for reviewers to see pending documents INCLUDING resubmitted ones"""
     
-    # Documents pending review (not reviewed yet)
+    # Get ALL pending documents (including resubmitted ones)
+    # Status can be 'pending' OR 'resubmitted' (if you add that status)
     pending_docs = Document.objects.filter(
-        status__in=['pending', 'under_review']
+        Q(status='pending') | Q(status='resubmitted')
     ).exclude(
-        reviews__isnull=False
+        uploader=request.user  # Exclude reviewer's own documents
     ).order_by('-uploaded_at')
     
     # Documents assigned to current reviewer
     my_assignments = ReviewAssignment.objects.filter(
         assigned_to=request.user,
         is_active=True,
-        document__status__in=['pending', 'under_review']
+        document__status__in=['pending', 'resubmitted', 'under_review']
     ).select_related('document')
     
-    # Recently reviewed
+    # Recently reviewed (including resubmissions)
     recent_reviews = Review.objects.filter(
         reviewer=request.user
     ).select_related('document')[:10]
     
-    # Statistics
+    # Statistics - include resubmitted in pending count
     stats = {
-        'pending': Document.objects.filter(status='pending').count(),
+        'pending': Document.objects.filter(
+            Q(status='pending') | Q(status='resubmitted')
+        ).count(),
         'under_review': Document.objects.filter(status='under_review').count(),
         'approved_today': Review.objects.filter(
             status='approved',
             created_at__date=timezone.now().date()
         ).count(),
         'my_pending': my_assignments.count(),
+        'resubmitted': Document.objects.filter(status='resubmitted').count(),
     }
     
     context = {
@@ -107,6 +111,9 @@ def review_document(request, doc_id):
     return render(request, 'review/review_document.html', context)
 
 # R-4.2: Resubmit rejected document
+# review/views.py - Updated resubmit_document function
+# review/views.py - Updated resubmit_document
+
 @login_required(login_url='accounts:login')
 def resubmit_document(request, doc_id):
     """Allow user to resubmit a rejected document"""
@@ -118,11 +125,26 @@ def resubmit_document(request, doc_id):
         return redirect('documents:detail', doc_id=document.id)
     
     if request.method == 'POST':
-        form = ResubmissionForm(request.POST, instance=document)
+        form = ResubmissionForm(request.POST, request.FILES, instance=document)
         if form.is_valid():
-            # Update document
+            # Update document metadata
             document = form.save(commit=False)
-            document.status = 'pending'  # Reset to pending (R-4.2)
+            
+            # Check if new file was uploaded
+            new_file = form.cleaned_data.get('new_file')
+            if new_file:
+                # Delete old file if it exists
+                if document.file:
+                    document.file.delete(save=False)
+                document.file = new_file
+                
+                # Auto-update file_type and file_size
+                ext = new_file.name.split('.')[-1].lower()
+                document.file_type = ext
+                document.file_size = new_file.size
+            
+            # IMPORTANT: Set status to 'resubmitted' instead of 'pending'
+            document.status = 'resubmitted'  # ← CHANGED FROM 'pending'
             document.save()
             
             # Create review record for resubmission
@@ -133,11 +155,10 @@ def resubmit_document(request, doc_id):
                 comments=f"Resubmitted with note: {form.cleaned_data['resubmission_note']}"
             )
             
-            messages.success(request, "Document resubmitted successfully!")
+            messages.success(request, "Document resubmitted successfully! It's now pending review.")
             return redirect('documents:detail', doc_id=document.id)
     else:
         form = ResubmissionForm(instance=document)
-        # Get last rejection comment
         last_rejection = document.reviews.filter(status='rejected').first()
     
     context = {

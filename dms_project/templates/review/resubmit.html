@@ -1,65 +1,188 @@
 {% extends 'base/base.html' %}
+{% load static %}
 
-{% block content %}
-<div class="card" style="max-width: 600px; margin: 0 auto;">
-    <h2 style="color: #4a5568; margin-bottom: 2rem;">Resubmit Document</h2>
-    
-    <!-- Last Rejection Feedback -->
-    {% if last_rejection %}
-    <div style="background: #fed7d7; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;">
-        <h3 style="color: #742a2a; margin-bottom: 0.5rem;">Reviewer Feedback</h3>
-        <p style="color: #742a2a;">{{ last_rejection.comments }}</p>
-        <small style="color: #742a2a;">Reviewed by {{ last_rejection.reviewer.username }} on {{ last_rejection.created_at|date:"F d, Y" }}</small>
-    </div>
-    {% endif %}
-    
-    <form method="post">
-        {% csrf_token %}
-        
-        <div class="form-group">
-            <label for="id_description">Description:</label>
-            {{ form.description }}
-        </div>
-        
-        <div class="form-group">
-            <label for="id_tags">Tags:</label>
-            {{ form.tags }}
-            <small>Separate tags with commas</small>
-        </div>
-        
-        <div class="form-group">
-            <label for="id_resubmission_note">Resubmission Note:</label>
-            {{ form.resubmission_note }}
-            <small>Explain what changes you've made</small>
-        </div>
-        
-        <button type="submit" class="btn">Resubmit Document</button>
-        <a href="{% url 'documents:detail' document.id %}" class="btn" style="background: #6c757d;">Cancel</a>
-    </form>
-</div>
-
+{% block extra_css %}
 <style>
+    .rejection-history {
+        margin-bottom: 2rem;
+    }
+    
+    .rejection-card {
+        background: #fff3cd;
+        border-left: 4px solid #dc3545;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        border-radius: 4px;
+    }
+    
+    .rejection-meta {
+        display: flex;
+        justify-content: space-between;
+        color: #856404;
+        font-size: 0.9rem;
+        margin-top: 0.5rem;
+    }
+    
+    .file-info {
+        background: #e7f3ff;
+        padding: 1rem;
+        border-radius: 4px;
+        margin-bottom: 1rem;
+    }
+    
+    .current-file {
+        background: #f8f9fa;
+        padding: 0.5rem;
+        border-radius: 4px;
+        border: 1px solid #dee2e6;
+    }
+    
     .form-group {
         margin-bottom: 1.5rem;
     }
+    
     .form-group label {
         display: block;
         margin-bottom: 0.5rem;
         font-weight: 600;
-        color: #4a5568;
+        color: #333;
     }
+    
     .form-group input,
+    .form-group select,
     .form-group textarea {
         width: 100%;
-        padding: 0.75rem;
-        border: 2px solid #e2e8f0;
-        border-radius: 6px;
-        font-size: 1rem;
+        padding: 0.5rem;
+        border: 1px solid #ddd;
+        border-radius: 4px;
     }
+    
     .form-group input:focus,
+    .form-group select:focus,
     .form-group textarea:focus {
         outline: none;
-        border-color: #667eea;
+        border-color: #007bff;
+    }
+    
+    .help-text {
+        font-size: 0.875rem;
+        color: #6c757d;
+        margin-top: 0.25rem;
+    }
+    
+    .btn {
+        display: inline-block;
+        padding: 0.5rem 1rem;
+        background: #007bff;
+        color: white;
+        text-decoration: none;
+        border-radius: 4px;
+        border: none;
+        cursor: pointer;
+        margin-right: 0.5rem;
+    }
+    
+    .btn:hover {
+        background: #0056b3;
+    }
+    
+    .btn-secondary {
+        background: #6c757d;
+    }
+    
+    .btn-secondary:hover {
+        background: #5a6268;
     }
 </style>
+{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width: 700px; margin: 0 auto;">
+    <h2 style="color: #333; margin-bottom: 2rem;">Resubmit Document: {{ document.title }}</h2>
+    
+    <!-- Current File Info -->
+    <div class="file-info">
+        <strong>Current File:</strong>
+        <div class="current-file">
+            {{ document.filename }} ({{ document.file_size|filesizeformat }})
+        </div>
+    </div>
+    
+    <!-- Rejection History -->
+    {% if rejection_history %}
+    <div class="rejection-history">
+        <h3 style="color: #dc3545; margin-bottom: 1rem;">Reviewer Feedback</h3>
+        {% for rejection in rejection_history %}
+        <div class="rejection-card">
+            <p><strong>{{ rejection.reviewer.username }}</strong> said:</p>
+            <p>{{ rejection.comments }}</p>
+            <div class="rejection-meta">
+                <span>{{ rejection.created_at|date:"F d, Y H:i" }}</span>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    <!-- Resubmission Form -->
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <!-- File Upload Section -->
+        <div class="form-group">
+            <label for="{{ form.new_file.id_for_label }}">{{ form.new_file.label }}:</label>
+            {{ form.new_file }}
+            {% if form.new_file.help_text %}
+                <div class="help-text">{{ form.new_file.help_text }}</div>
+            {% endif %}
+            {% if form.new_file.errors %}
+                <div style="color: #dc3545; margin-top: 0.25rem;">{{ form.new_file.errors }}</div>
+            {% endif %}
+            <div class="help-text">Leave empty to keep the current file</div>
+        </div>
+        
+        <hr style="margin: 2rem 0;">
+        
+        <!-- Document Metadata -->
+        <h3 style="margin-bottom: 1rem;">Document Information</h3>
+        
+        <div class="form-group">
+            <label for="{{ form.title.id_for_label }}">Title:</label>
+            {{ form.title }}
+        </div>
+        
+        <div class="form-group">
+            <label for="{{ form.description.id_for_label }}">Description:</label>
+            {{ form.description }}
+        </div>
+        
+        <div class="form-group">
+            <label for="{{ form.author.id_for_label }}">Author:</label>
+            {{ form.author }}
+        </div>
+        
+        <div class="form-group">
+            <label for="{{ form.category.id_for_label }}">Category:</label>
+            {{ form.category }}
+        </div>
+        
+        <div class="form-group">
+            <label for="{{ form.tags.id_for_label }}">Tags:</label>
+            {{ form.tags }}
+            <div class="help-text">{{ form.tags.help_text }}</div>
+        </div>
+        
+        <!-- Resubmission Note -->
+        <div class="form-group">
+            <label for="{{ form.resubmission_note.id_for_label }}">Resubmission Note:</label>
+            {{ form.resubmission_note }}
+            <div class="help-text">Explain what changes you've made (required)</div>
+        </div>
+        
+        <div style="margin-top: 2rem;">
+            <button type="submit" class="btn">Submit Resubmission</button>
+            <a href="{% url 'documents:detail' document.id %}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
 {% endblock %}
