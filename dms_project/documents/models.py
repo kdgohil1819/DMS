@@ -18,6 +18,30 @@ class Document(models.Model):
         ('png', 'PNG'),
     ]
     
+    # Predefined Categories
+    CATEGORY_CHOICES = [
+        ('personal', 'Personal'),
+        ('work', 'Work'),
+        ('study', 'Study'),
+        ('research', 'Research'),
+        ('report', 'Report'),
+        ('invoice', 'Invoice'),
+        ('contract', 'Contract'),
+        ('other', 'Other'),
+    ]
+    
+    # Predefined Tags
+    TAG_CHOICES = [
+        ('important', 'Important'),
+        ('confidential', 'Confidential'),
+        ('draft', 'Draft'),
+        ('final', 'Final'),
+        ('urgent', 'Urgent'),
+        ('archive', 'Archive'),
+        ('reference', 'Reference'),
+        ('temporary', 'Temporary'),
+    ]
+    
     STATUS_CHOICES = [
         ('pending', 'Pending'),
         ('under_review', 'Under Review'),
@@ -32,15 +56,15 @@ class Document(models.Model):
     file_type = models.CharField(max_length=10, choices=SUPPORTED_FORMATS, default='pdf')
     file_size = models.IntegerField(help_text="File size in bytes", editable=False, default=0)
     
-    # Metadata for search (R-3.1)
+    # Metadata for search - Now with choices
     author = models.CharField(max_length=100, blank=True)
-    category = models.CharField(max_length=100, blank=True)
-    tags =  models.CharField(max_length=500, blank=True, help_text="Comma-separated tags", default='')
+    category = models.CharField(max_length=50, choices=CATEGORY_CHOICES, blank=True, default='other')
+    tags = models.CharField(max_length=500, blank=True, help_text="Comma-separated tags")
     
     # Relationships
     uploader = models.ForeignKey(User, on_delete=models.CASCADE, related_name='documents')
     
-    # Status for workflow (R-4.1)
+    # Status for workflow
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     
     # Timestamps
@@ -58,6 +82,10 @@ class Document(models.Model):
     
     def filename(self):
         return os.path.basename(self.file.name)
+    
+    def get_tags_list(self):
+        """Return tags as a list"""
+        return [tag.strip() for tag in self.tags.split(',') if tag.strip()]
     
     def __str__(self):
         return self.title
