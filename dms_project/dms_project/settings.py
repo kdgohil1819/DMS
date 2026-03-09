@@ -82,9 +82,9 @@ WSGI_APPLICATION = 'dms_project.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'dms_db',                 # Database name you created
+        'NAME': 'dms_db',                 # Database name  
         'USER': 'dms_user',                # MySQL username
-        'PASSWORD': 'Dms@2024secure',      # MySQL password (use yours)
+        'PASSWORD': 'Dms@2024secure',      # MySQL password 
         'HOST': '127.0.0.1',                # CRITICAL: Use 127.0.0.1 NOT localhost
         'PORT': '3306',                      # MySQL default port
         'OPTIONS': {
@@ -138,7 +138,7 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-LOGIN_URL = '/accounts/login/'  # Changed from 'login' to full path
+LOGIN_URL = '/accounts/login/'  
 LOGIN_REDIRECT_URL = '/accounts/dashboard'
 LOGOUT_REDIRECT_URL = '/accounts/login/'
 LOGIN_URL = '/accounts/login/'
