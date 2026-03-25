@@ -20,7 +20,7 @@ def is_reviewer(user):
 @login_required
 @user_passes_test(is_admin)
 def admin_dashboard(request):
-    """Admin dashboard with system overview"""
+    """Admin dashboard with system overview""" 
     
     # Statistics
     total_users = User.objects.count()
@@ -65,6 +65,8 @@ def user_list(request):
     }
     return render(request, 'access/user_list.html', context)
 
+# access/views.py - Updated edit_user function
+
 @login_required
 @user_passes_test(is_admin)
 def edit_user(request, user_id):
@@ -78,10 +80,22 @@ def edit_user(request, user_id):
         user.first_name = request.POST.get('first_name', user.first_name)
         user.last_name = request.POST.get('last_name', user.last_name)
         user.is_active = request.POST.get('is_active') == 'on'
+        
+        # IMPORTANT: Update superuser status based on role
+        selected_role = request.POST.get('role', profile.role)
+        if selected_role == 'admin':
+            user.is_superuser = True
+            user.is_staff = True
+        else:
+            # Only remove superuser if changing from admin to non-admin
+            if profile.role == 'admin' and selected_role != 'admin':
+                user.is_superuser = False
+                user.is_staff = False
+        
         user.save()
         
         # Update profile
-        profile.role = request.POST.get('role', profile.role)
+        profile.role = selected_role
         profile.department = request.POST.get('department', '')
         profile.phone = request.POST.get('phone', '')
         profile.bio = request.POST.get('bio', '')
@@ -96,7 +110,6 @@ def edit_user(request, user_id):
         'roles': UserProfile.ROLE_CHOICES,
     }
     return render(request, 'access/edit_user.html', context)
-
 @login_required
 @user_passes_test(is_manager)
 def create_user(request):
@@ -121,8 +134,8 @@ def create_user(request):
     context = {
         'roles': UserProfile.ROLE_CHOICES,
     }
-    return render(request, 'access/create_user.html', context)
-
+    return render(request, 'accounts/register.html', context)
+  
 @login_required
 @user_passes_test(is_admin)
 def user_permissions(request, user_id):
