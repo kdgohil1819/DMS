@@ -57,10 +57,7 @@
                 <span class="action-icon">➕</span>
                 <span class="action-text">Create User</span>
             </a>
-            <a href="{% url 'access:role_list' %}" class="admin-action-card">
-                <span class="action-icon">👥</span>
-                <span class="action-text">Manage Roles</span>
-            </a>
+        
             <a href="{% url 'documents:upload' %}" class="admin-action-card">
                 <span class="action-icon">📤</span>
                 <span class="action-text">Upload</span>
@@ -110,9 +107,7 @@
                     </td>
                     <td>
                         <a href="{% url 'access:edit_user' user_item.id %}" style="color: #007bff;">Edit</a>
-                        {% if user.is_superuser %}
-                        | <a href="{% url 'access:user_permissions' user_item.id %}" style="color: #28a745;">Permissions</a>
-                        {% endif %}
+                       
                     </td>
                 </tr>
                 {% empty %}
